@@ -21,6 +21,7 @@ namespace FashionReporter
             pluginInterface.Create<Service>();
 
             // TODO: Current idea is to iterate over ItemSlot and init a list of windows, to then add to the system
+            //       Another idea is to have a primary window with buttons. pressing a button opens a secondary window. Total window count goes from 10 to 2.
             foreach (var slot in Enum.GetValues<ItemSlot>())
             {
                 var window = new MainWindow(slot);

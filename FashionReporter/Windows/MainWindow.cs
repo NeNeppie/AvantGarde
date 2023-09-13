@@ -101,8 +101,10 @@ public class MainWindow : Window
         {
             var childNode = innerNode->ChildNode->PrevSiblingNode;
             var slotNode = addon->GetNodeById(this.SlotNodeID);
-            this.Position = this.GetNodeTruePos(addon, childNode) +
-                new Vector2(slotNode->X * 1.8f * addon->Scale, slotNode->Y * addon->Scale);
+            this.Position = new Vector2(addon->X, addon->Y) +
+                            this.GetNodeTruePos(addon, childNode) +
+                            this.GetNodeTruePos(addon, innerNode) +
+                            new Vector2(slotNode->X * 1.8f * addon->Scale, slotNode->Y * addon->Scale);
 
             var slotNodeText = slotNode->GetAsAtkTextNode();
             if (slotCategory == "")
@@ -136,13 +138,7 @@ public class MainWindow : Window
 
     private unsafe Vector2 GetNodeTruePos(AtkUnitBase* addon, AtkResNode* node)
     {
-        var position = new Vector2();
-        while (node != (AtkResNode*)addon)
-        {
-            position += new Vector2(node->X * addon->Scale, node->Y * addon->Scale);
-            node = node->ParentNode;
-        }
-        return position += new Vector2(addon->X, addon->Y);
+        return new Vector2(node->X * addon->Scale, node->Y * addon->Scale);
     }
 
     // TODO: Move this out to a different file
