@@ -40,6 +40,8 @@ public class MainWindow
     private readonly List<Category>? Data;
     private ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
 
+    private static readonly SlotWindow SlotWindow = new();
+
     public MainWindow()
     {
         // TODO: Reformat later?
@@ -97,8 +99,6 @@ public class MainWindow
             {
                 slotCategory = MemoryHelper.ReadSeStringNullTerminated(new nint(addon->AtkValues[atkValueIndex].String)).TextValue;
                 if (slotCategory == "") { continue; }
-
-
             }
 
             // TODO: Proper sizing, global scale yada yada you know the deal already (applies to all elements so far)
@@ -115,20 +115,21 @@ public class MainWindow
 
                 if (Utilities.IconButton(FontAwesomeIcon.List, new Vector2(60), "Show Gear"))
                 {
-                    // Draw();
+                    SlotWindow.Update(slot, slotCategory, this.Data, ImGui.GetWindowPos());
                 }
 
-                ImGui.PopStyleVar();
-                ImGui.PopStyleColor();
+                ImGui.PopStyleVar(2);
+                ImGui.PopStyleColor(4);
             }
             ImGui.EndChild();
         }
+        SlotWindow.Draw();
 
         ImGui.End();
     }
 
     // TODO: Move this out to a different file
-    private static bool IsMatchingSlot(Item item, ItemSlot slot)
+    public static bool IsMatchingSlot(Item item, ItemSlot slot)
     {
         return slot switch
         {
