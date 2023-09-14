@@ -1,10 +1,990 @@
 [
     {
-        "Name": "Fringed and Footloose",
-        "IDs": [12008, 12010, 19621]
+        "Name": "Deep Freeze",
+        "IDs": []
+    },
+    {
+        "Name": "The Coil That Binds",
+        "IDs": []
+    },
+    {
+        "Name": "Cid Approved",
+        "IDs": []
+    },
+    {
+        "Name": "Animal Instincts",
+        "IDs": []
+    },
+    {
+        "Name": "Winter Wonderland",
+        "IDs": []
+    },
+    {
+        "Name": "Wild Whiskers",
+        "IDs": []
+    },
+    {
+        "Name": "Keeping It Casual",
+        "IDs": []
+    },
+    {
+        "Name": "Keeping It Weird",
+        "IDs": []
+    },
+    {
+        "Name": "Sleight of Hand",
+        "IDs": []
+    },
+    {
+        "Name": "Near Eastern Nights",
+        "IDs": []
+    },
+    {
+        "Name": "Shivering Timbers",
+        "IDs": []
+    },
+    {
+        "Name": "Keeping Company",
+        "IDs": []
+    },
+    {
+        "Name": "The Wild Side",
+        "IDs": []
+    },
+    {
+        "Name": "Monster Party",
+        "IDs": []
+    },
+    {
+        "Name": "A True “Spectacle”",
+        "IDs": []
+    },
+    {
+        "Name": "Cooking up a Storm",
+        "IDs": []
+    },
+    {
+        "Name": "Summer Breeze",
+        "IDs": []
+    },
+    {
+        "Name": "Brain over Brawn",
+        "IDs": []
+    },
+    {
+        "Name": "Natural Beauty",
+        "IDs": []
+    },
+    {
+        "Name": "Fresh and Formal",
+        "IDs": []
+    },
+    {
+        "Name": "In Sheep's Clothing",
+        "IDs": []
+    },
+    {
+        "Name": "Too Cool",
+        "IDs": []
+    },
+    {
+        "Name": "Avant Garde",
+        "IDs": []
+    },
+    {
+        "Name": "To Adventure",
+        "IDs": []
+    },
+    {
+        "Name": "Riding High",
+        "IDs": []
+    },
+    {
+        "Name": "Noblesse Oblige",
+        "IDs": []
+    },
+    {
+        "Name": "Vagabond",
+        "IDs": []
+    },
+    {
+        "Name": "A Sailor's Life",
+        "IDs": []
+    },
+    {
+        "Name": "Skirts of a Feather",
+        "IDs": []
+    },
+    {
+        "Name": "Weird Science",
+        "IDs": []
+    },
+    {
+        "Name": "Tooth and “Nail”",
+        "IDs": []
+    },
+    {
+        "Name": "Motley Crew",
+        "IDs": []
+    },
+    {
+        "Name": "Pirates in the Sky",
+        "IDs": []
+    },
+    {
+        "Name": "I Believe in Magic",
+        "IDs": []
+    },
+    {
+        "Name": "Fashion Bandit",
+        "IDs": []
+    },
+    {
+        "Name": "C'est Chic",
+        "IDs": []
+    },
+    {
+        "Name": "Going Garo",
+        "IDs": []
+    },
+    {
+        "Name": "Medic!",
+        "IDs": []
+    },
+    {
+        "Name": "Bewitched",
+        "IDs": []
+    },
+    {
+        "Name": "Less is More",
+        "IDs": []
+    },
+    {
+        "Name": "Go West",
+        "IDs": []
+    },
+    {
+        "Name": "Star “Studded”",
+        "IDs": []
+    },
+    {
+        "Name": "“Labor” of Love",
+        "IDs": []
+    },
+    {
+        "Name": "Cute as a Button",
+        "IDs": []
+    },
+    {
+        "Name": "Fur and Fluff",
+        "IDs": []
+    },
+    {
+        "Name": "“Fringe” Benefits",
+        "IDs": []
+    },
+    {
+        "Name": "On Ceremony",
+        "IDs": []
+    },
+    {
+        "Name": "Rest & Relaxation",
+        "IDs": []
+    },
+    {
+        "Name": "Mighty Minion",
+        "IDs": []
+    },
+    {
+        "Name": "For the Flag",
+        "IDs": []
+    },
+    {
+        "Name": "Simply Gorgeous",
+        "IDs": []
+    },
+    {
+        "Name": "A “Bone” to Pick",
+        "IDs": []
+    },
+    {
+        "Name": "Friend to the End",
+        "IDs": []
+    },
+    {
+        "Name": "Finally Fantastical",
+        "IDs": []
+    },
+    {
+        "Name": "Wind in the Willows",
+        "IDs": []
+    },
+    {
+        "Name": "Veteran Hand",
+        "IDs": []
+    },
+    {
+        "Name": "What's for Dinner",
+        "IDs": []
+    },
+    {
+        "Name": "The Cloth I Bear",
+        "IDs": []
+    },
+    {
+        "Name": "Veteran of War",
+        "IDs": []
+    },
+    {
+        "Name": "Allagan Attack",
+        "IDs": []
+    },
+    {
+        "Name": "Leather",
+        "IDs": []
+    },
+    {
+        "Name": "Veteran of the Land",
+        "IDs": []
+    },
+    {
+        "Name": "Bookworm",
+        "IDs": []
+    },
+    {
+        "Name": "Silken Things",
+        "IDs": []
+    },
+    {
+        "Name": "Call of the Wild",
+        "IDs": []
+    },
+    {
+        "Name": "Simple Is Best",
+        "IDs": []
+    },
+    {
+        "Name": "“Under”dressed",
+        "IDs": []
+    },
+    {
+        "Name": "Son of a Gun",
+        "IDs": []
+    },
+    {
+        "Name": "Ritual Wrap",
+        "IDs": []
+    },
+    {
+        "Name": "Skalla Back",
+        "IDs": []
+    },
+    {
+        "Name": "Long Skirt",
+        "IDs": []
+    },
+    {
+        "Name": "“Groin” Pains",
+        "IDs": []
+    },
+    {
+        "Name": "Mini Me",
+        "IDs": []
+    },
+    {
+        "Name": "Ao Dai",
+        "IDs": []
+    },
+    {
+        "Name": "Short Boots",
+        "IDs": []
+    },
+    {
+        "Name": "In the “Fold”",
+        "IDs": []
+    },
+    {
+        "Name": "Royal",
+        "IDs": []
+    },
+    {
+        "Name": "Thinly Veiled",
+        "IDs": []
+    },
+    {
+        "Name": "Healing Lilies",
+        "IDs": []
+    },
+    {
+        "Name": "Chapeau du Choice",
+        "IDs": []
+    },
+    {
+        "Name": "Tight-knit",
+        "IDs": []
+    },
+    {
+        "Name": "Pocketful o' Pansies",
+        "IDs": []
+    },
+    {
+        "Name": "Daisy Chain",
+        "IDs": []
+    },
+    {
+        "Name": "Mono a Mono",
+        "IDs": []
+    },
+    {
+        "Name": "Cap in Hand",
+        "IDs": []
+    },
+    {
+        "Name": "They Do Nothing",
+        "IDs": []
+    },
+    {
+        "Name": "Blow Your Horn",
+        "IDs": []
+    },
+    {
+        "Name": "The Last Straw",
+        "IDs": []
+    },
+    {
+        "Name": "Masterless",
+        "IDs": []
+    },
+    {
+        "Name": "Ride the Tides",
+        "IDs": []
+    },
+    {
+        "Name": "Smallfolk",
+        "IDs": []
+    },
+    {
+        "Name": "Do Rats Fly",
+        "IDs": []
+    },
+    {
+        "Name": "Born Bliaud",
+        "IDs": []
+    },
+    {
+        "Name": "A Pirate's Life",
+        "IDs": []
+    },
+    {
+        "Name": "Packing",
+        "IDs": []
+    },
+    {
+        "Name": "Doublet the Fun",
+        "IDs": []
+    },
+    {
+        "Name": "True Linen",
+        "IDs": []
+    },
+    {
+        "Name": "In Tunic",
+        "IDs": []
+    },
+    {
+        "Name": "Cascade",
+        "IDs": []
+    },
+    {
+        "Name": "Quick to the Poncho",
+        "IDs": []
+    },
+    {
+        "Name": "Ala Mhigan",
+        "IDs": []
+    },
+    {
+        "Name": "Well-suited",
+        "IDs": []
+    },
+    {
+        "Name": "Turn-coatee",
+        "IDs": []
+    },
+    {
+        "Name": "Under-armor",
+        "IDs": []
+    },
+    {
+        "Name": "Scarf it Down",
+        "IDs": []
+    },
+    {
+        "Name": "Autumn Chill",
+        "IDs": []
+    },
+    {
+        "Name": "Up a Long Sleeve",
+        "IDs": []
+    },
+    {
+        "Name": "Hingan Nights",
+        "IDs": []
+    },
+    {
+        "Name": "Hand in Long Glove",
+        "IDs": []
+    },
+    {
+        "Name": "Up in Armlets",
+        "IDs": []
+    },
+    {
+        "Name": "Hand in Halfglove",
+        "IDs": []
+    },
+    {
+        "Name": "All in the Wrist",
+        "IDs": []
+    },
+    {
+        "Name": "Nails in the Coffin",
+        "IDs": []
+    },
+    {
+        "Name": "White-glove",
+        "IDs": []
+    },
+    {
+        "Name": "Iron Fist",
+        "IDs": []
+    },
+    {
+        "Name": "Old Country",
+        "IDs": []
+    },
+    {
+        "Name": "Brace for Impact",
+        "IDs": []
+    },
+    {
+        "Name": "Too Legit",
+        "IDs": []
+    },
+    {
+        "Name": "Pretty in Pantaloons",
+        "IDs": []
+    },
+    {
+        "Name": "Flutterbye",
+        "IDs": []
+    },
+    {
+        "Name": "Short Shorts",
+        "IDs": []
+    },
+    {
+        "Name": "Hells or High Water",
+        "IDs": []
+    },
+    {
+        "Name": "Talk about Slacks",
+        "IDs": []
+    },
+    {
+        "Name": "Suddenly Sarouels",
+        "IDs": []
+    },
+    {
+        "Name": "Flap in Front",
+        "IDs": []
+    },
+    {
+        "Name": "Pumped Up Kecks",
+        "IDs": []
+    },
+    {
+        "Name": "Rouse Trousers",
+        "IDs": []
+    },
+    {
+        "Name": "Devil in Denim",
+        "IDs": []
+    },
+    {
+        "Name": "Mountain Bred",
+        "IDs": []
+    },
+    {
+        "Name": "Moccasin City",
+        "IDs": []
+    },
+    {
+        "Name": "Shod with Sandals",
+        "IDs": []
+    },
+    {
+        "Name": "Tight and Long",
+        "IDs": []
+    },
+    {
+        "Name": "Caligae Divorcee",
+        "IDs": []
+    },
+    {
+        "Name": "Beautiful Dreamer",
+        "IDs": []
+    },
+    {
+        "Name": "Yukata",
+        "IDs": []
+    },
+    {
+        "Name": "The Creator",
+        "IDs": []
+    },
+    {
+        "Name": "Dravanian Choker",
+        "IDs": []
+    },
+    {
+        "Name": "The Son",
+        "IDs": []
+    },
+    {
+        "Name": "Jewels of Red",
+        "IDs": []
+    },
+    {
+        "Name": "Coiled Secondly",
+        "IDs": []
+    },
+    {
+        "Name": "Jewels of Violet",
+        "IDs": []
+    },
+    {
+        "Name": "Jewels of Yellow",
+        "IDs": []
+    },
+    {
+        "Name": "Coiled Finally",
+        "IDs": []
+    },
+    {
+        "Name": "Peas and Onions",
+        "IDs": []
+    },
+    {
+        "Name": "Off to War",
+        "IDs": []
+    },
+    {
+        "Name": "Leaping Leopards",
+        "IDs": []
+    },
+    {
+        "Name": "Raising the Barbut",
+        "IDs": []
+    },
+    {
+        "Name": "A Knight for Helms",
+        "IDs": []
+    },
+    {
+        "Name": "1 Eye Is Better than 2",
+        "IDs": []
+    },
+    {
+        "Name": "Hungry Like the Wolf",
+        "IDs": []
+    },
+    {
+        "Name": "Future Arma",
+        "IDs": []
+    },
+    {
+        "Name": "These Broken Wings",
+        "IDs": []
+    },
+    {
+        "Name": "Feather in Your Cap",
+        "IDs": []
+    },
+    {
+        "Name": "Traveling Light",
+        "IDs": []
+    },
+    {
+        "Name": "Bloodsands",
+        "IDs": []
+    },
+    {
+        "Name": "Drapes of Wrath",
+        "IDs": []
+    },
+    {
+        "Name": "Jerkin Boys",
+        "IDs": []
+    },
+    {
+        "Name": "On the Plate",
+        "IDs": []
+    },
+    {
+        "Name": "Who Needs Sleeves",
+        "IDs": []
+    },
+    {
+        "Name": "Primal Revival",
+        "IDs": []
+    },
+    {
+        "Name": "The Tale of Genji",
+        "IDs": []
+    },
+    {
+        "Name": "Acton Locally",
+        "IDs": []
+    },
+    {
+        "Name": "Tipping the Scales",
+        "IDs": []
+    },
+    {
+        "Name": "The Conqueror",
+        "IDs": []
+    },
+    {
+        "Name": "The Outlaw",
+        "IDs": []
+    },
+    {
+        "Name": "Ryumyaku",
+        "IDs": []
+    },
+    {
+        "Name": "Dueling Duelist",
+        "IDs": []
+    },
+    {
+        "Name": "Revolutionary",
+        "IDs": []
+    },
+    {
+        "Name": "Acton Globally",
+        "IDs": []
+    },
+    {
+        "Name": "Chimerican Woman",
+        "IDs": []
+    },
+    {
+        "Name": "Simply Saucer",
+        "IDs": []
+    },
+    {
+        "Name": "Tip o' the Arhat",
+        "IDs": []
+    },
+    {
+        "Name": "Leader of the Ringband",
+        "IDs": []
+    },
+    {
+        "Name": "Giving the Fingerless",
+        "IDs": []
+    },
+    {
+        "Name": "Fits Like a Wristglove",
+        "IDs": []
+    },
+    {
+        "Name": "Rocking Ribbons",
+        "IDs": []
+    },
+    {
+        "Name": "Superbly Spiked",
+        "IDs": []
+    },
+    {
+        "Name": "Diabolical",
+        "IDs": []
+    },
+    {
+        "Name": "What You Kneed",
+        "IDs": []
+    },
+    {
+        "Name": "Cast Your Culottes",
+        "IDs": []
+    },
+    {
+        "Name": "“Ala” Carte",
+        "IDs": []
+    },
+    {
+        "Name": "Found Allagan",
+        "IDs": []
+    },
+    {
+        "Name": "Check and Check",
+        "IDs": []
+    },
+    {
+        "Name": "Storm of Blood",
+        "IDs": []
+    },
+    {
+        "Name": "Toward the Heavens",
+        "IDs": []
+    },
+    {
+        "Name": "Reborn",
+        "IDs": []
+    },
+    {
+        "Name": "Chausses of Choice",
+        "IDs": []
+    },
+    {
+        "Name": "Armored Core",
+        "IDs": []
+    },
+    {
+        "Name": "Paying the Duckbills",
+        "IDs": []
+    },
+    {
+        "Name": "Patten on the Back",
+        "IDs": []
+    },
+    {
+        "Name": "Leather Underfoot",
+        "IDs": []
+    },
+    {
+        "Name": "Dressed for Success",
+        "IDs": []
+    },
+    {
+        "Name": "Jewels of Blue",
+        "IDs": []
+    },
+    {
+        "Name": "Jewels of Green",
+        "IDs": []
+    },
+    {
+        "Name": "Jewels of White",
+        "IDs": []
+    },
+    {
+        "Name": "Jewels of Black",
+        "IDs": []
+    },
+    {
+        "Name": "The Father",
+        "IDs": []
+    },
+    {
+        "Name": "More Beast than Man",
+        "IDs": []
+    },
+    {
+        "Name": "Masquerade",
+        "IDs": []
+    },
+    {
+        "Name": "To Chains",
+        "IDs": []
+    },
+    {
+        "Name": "Face of the Forest",
+        "IDs": []
+    },
+    {
+        "Name": "Carved Cheeks",
+        "IDs": []
+    },
+    {
+        "Name": "Give Beads a Chance",
+        "IDs": []
+    },
+    {
+        "Name": "Kinky Boots",
+        "IDs": []
+    },
+    {
+        "Name": "Darkside of a Hero",
+        "IDs": []
+    },
+    {
+        "Name": "Bush Stylish",
+        "IDs": []
+    },
+    {
+        "Name": "Proto Posh",
+        "IDs": []
+    },
+    {
+        "Name": "Smitten with Mittens",
+        "IDs": []
+    },
+    {
+        "Name": "Moon Unit",
+        "IDs": []
+    },
+    {
+        "Name": "Flower Power",
+        "IDs": []
+    },
+    {
+        "Name": "Restoration Regalia",
+        "IDs": []
+    },
+    {
+        "Name": "Dalmascan Chic",
+        "IDs": []
     },
     {
         "Name": "You're So Whisperfine",
         "IDs": [24004, 24005, 24006]
+    },
+    {
+        "Name": "Ready for Rain",
+        "IDs": []
+    },
+    {
+        "Name": "Beastly Head-turner",
+        "IDs": []
+    },
+    {
+        "Name": "Bonewicca Bow Wow",
+        "IDs": []
+    },
+    {
+        "Name": "Fashionably Late Allagan",
+        "IDs": []
+    },
+    {
+        "Name": "Sugarloaf Sweet",
+        "IDs": []
+    },
+    {
+        "Name": "Bird Brain",
+        "IDs": []
+    },
+    {
+        "Name": "Striding in Stripes",
+        "IDs": []
+    },
+    {
+        "Name": "Foxy Features",
+        "IDs": []
+    },
+    {
+        "Name": "Fringed and Footloose",
+        "IDs": [12008, 12010, 19621]
+    },
+    {
+        "Name": "Coifed to Perfection",
+        "IDs": []
+    },
+    {
+        "Name": "Best Dress-ed",
+        "IDs": []
+    },
+    {
+        "Name": "Cosmos in Bloom",
+        "IDs": []
+    },
+    {
+        "Name": "Carnation Celebration",
+        "IDs": []
+    },
+    {
+        "Name": "Like a Moth to an Orchid",
+        "IDs": []
+    },
+    {
+        "Name": "Imperial Couture",
+        "IDs": []
+    },
+    {
+        "Name": "Guardian's Garb",
+        "IDs": []
+    },
+    {
+        "Name": "Robed in Resistance",
+        "IDs": []
+    },
+    {
+        "Name": "Lily Triplet",
+        "IDs": []
+    },
+    {
+        "Name": "Rose for the Occasion",
+        "IDs": []
+    },
+    {
+        "Name": "Omega Ornamentation",
+        "IDs": []
+    },
+    {
+        "Name": "NieR and Far",
+        "IDs": []
+    },
+    {
+        "Name": "Mantle of Mod",
+        "IDs": []
+    },
+    {
+        "Name": "Distressed and Damaged",
+        "IDs": []
+    },
+    {
+        "Name": "Claws of War",
+        "IDs": []
+    },
+    {
+        "Name": "Adventure First Worn",
+        "IDs": []
+    },
+    {
+        "Name": "Sweet Sakura",
+        "IDs": []
+    },
+    {
+        "Name": "Foundation's Forefront",
+        "IDs": []
+    },
+    {
+        "Name": "The Great Sigmascape",
+        "IDs": []
+    },
+    {
+        "Name": "Love & Peace",
+        "IDs": []
+    },
+    {
+        "Name": "Behorned",
+        "IDs": []
+    },
+    {
+        "Name": "Monster Hunt",
+        "IDs": []
+    },
+    {
+        "Name": "Traveling Dawn",
+        "IDs": []
+    },
+    {
+        "Name": "Noir",
+        "IDs": []
+    },
+    {
+        "Name": "Floral Delight",
+        "IDs": []
     }
 ]
