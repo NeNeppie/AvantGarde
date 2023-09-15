@@ -87,11 +87,15 @@ public class MainWindow
 
             var childNode = innerNode->ChildNode->PrevSiblingNode;
             var slotNode = addon->GetNodeById(slotNodeID);
+            var buttonSize = slotNode->Height * addon->Scale * 0.8f;
             var position = GuiUtilities.GetNodePosAbsolute(addon, childNode)
                             + GuiUtilities.GetNodePosAbsolute(addon, innerNode)
                             + new Vector2(slotNode->X * addon->Scale, slotNode->Y * addon->Scale);
+
+            position += (new Vector2((slotNode->Height * addon->Scale) - buttonSize) * 0.5f) + ImGui.GetStyle().FramePadding;
             if (slot >= ItemSlot.Ears)
                 position += new Vector2((slotNode->Width * addon->Scale) - 60, 0);
+
             ImGui.SetCursorPos(position);
 
             var slotNodeText = slotNode->GetAsAtkTextNode();
@@ -102,7 +106,7 @@ public class MainWindow
             }
 
             // TODO: Proper sizing, global scale yada yada you know the deal already (applies to all elements so far)
-            ImGui.BeginChild($"##child-{slot}", new Vector2(60));
+            ImGui.BeginChild($"##child-{slot}", new Vector2(buttonSize));
             {
                 ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.6f, 0.6f, 0.6f, 0.4f));
                 ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0.4f, 0.4f, 0.4f, 0.6f));
@@ -113,7 +117,7 @@ public class MainWindow
                 ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 3f);
                 ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 15f);
 
-                if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(60), "Show Gear"))
+                if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(buttonSize), "Show Gear"))
                 {
                     SlotWindow.Update(slot, slotCategory, this.Data, ImGui.GetWindowPos());
                 }
