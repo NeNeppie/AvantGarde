@@ -12,6 +12,8 @@ namespace FashionReporter.UI;
 
 public class SlotWindow
 {
+    private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
+
     private readonly List<Item> Items;
     private List<Item> ItemsFiltered;
     private ItemSlot Slot;
@@ -31,7 +33,7 @@ public class SlotWindow
         this.ItemsFiltered = this.Items;
     }
 
-    public void Update(ItemSlot slot, string slotCategory, List<Category>? data, Vector2 windowPos)
+    public void Update(ItemSlot slot, string slotCategory, List<Category>? data, Vector2 windowPos, float buttonSize)
     {
         this.IsOpen = !this.IsOpen;
 
@@ -40,7 +42,7 @@ public class SlotWindow
         {
             this.Slot = slot;
             this.Position = windowPos;
-            this.Position.X += slot >= ItemSlot.Ears ? 60 : -GuiUtilities.SlotWindowSize.X;
+            this.Position.X += slot >= ItemSlot.Ears ? buttonSize : -GuiUtilities.SlotWindowSize.X;
 
             var category = data?.Find(x => x.Name == slotCategory!);
             if (category is not null)
@@ -57,7 +59,7 @@ public class SlotWindow
 
         ImGui.SetNextWindowSize(GuiUtilities.SlotWindowSize);
         ImGui.SetNextWindowPos(this.Position);
-        if (!ImGui.Begin($"##fashionreporter-item-display-{this.Slot}", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize))
+        if (!ImGui.Begin($"##fashionreporter-item-display-{this.Slot}", WindowFlags))
         {
             ImGui.End();
             return;

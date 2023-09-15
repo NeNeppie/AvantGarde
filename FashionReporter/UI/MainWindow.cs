@@ -37,10 +37,10 @@ public class Category
 
 public class MainWindow
 {
-    private readonly List<Category>? Data;
-    private ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
-
     private static readonly SlotWindow SlotWindow = new();
+    private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
+
+    private readonly List<Category>? Data;
 
     public MainWindow()
     {
@@ -66,11 +66,12 @@ public class MainWindow
 
     public unsafe void Draw(AtkUnitBase* addon)
     {
-        var innerNode = addon->GetNodeById(6);
-        if (innerNode is null || addon->RootNode is null) { return; }
+        if (addon->RootNode is null) { return; }
 
+        ImGui.SetNextWindowSize(new Vector2(addon->RootNode->Width, addon->RootNode->Height) * addon->Scale);
+        ImGui.SetNextWindowPos(new Vector2(addon->X, addon->Y));
         ImGuiHelpers.ForceNextWindowMainViewport();
-        if (!ImGui.Begin("Fashion Reporter", this.WindowFlags))
+        if (!ImGui.Begin("Fashion Reporter", WindowFlags))
         {
             ImGui.End();
             return;
@@ -87,23 +88,11 @@ public class MainWindow
 
             var childNode = innerNode->ChildNode->PrevSiblingNode;
             var slotNode = addon->GetNodeById(slotNodeID);
+
             var buttonSize = slotNode->Height * addon->Scale * 0.8f;
-            var position = GuiUtilities.GetNodePosAbsolute(addon, childNode)
-                            + GuiUtilities.GetNodePosAbsolute(addon, innerNode)
-                            + new Vector2(slotNode->X * addon->Scale, slotNode->Y * addon->Scale);
+            ImGui.SetCursorPos(this.GetButtonPosition(addon, slotNode, slot));
 
-            position += (new Vector2((slotNode->Height * addon->Scale) - buttonSize) * 0.5f) + ImGui.GetStyle().FramePadding;
-            if (slot >= ItemSlot.Ears)
-                position += new Vector2((slotNode->Width * addon->Scale) - 60, 0);
-
-            ImGui.SetCursorPos(position);
-
-            var slotNodeText = slotNode->GetAsAtkTextNode();
-            if (slotCategory == "")
-            {
-                slotCategory = MemoryHelper.ReadSeStringNullTerminated(new nint(addon->AtkValues[atkValueIndex].String)).TextValue;
-                if (slotCategory == "") { continue; }
-            }
+            slotCategory = MemoryHelper.ReadSeStringNullTerminated(new nint(addon->AtkValues[atkValueIndex].String)).TextValue;
 
             // TODO: Proper sizing, global scale yada yada you know the deal already (applies to all elements so far)
             ImGui.BeginChild($"##child-{slot}", new Vector2(buttonSize));
@@ -119,7 +108,7 @@ public class MainWindow
 
                 if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(buttonSize), "Show Gear"))
                 {
-                    SlotWindow.Update(slot, slotCategory, this.Data, ImGui.GetWindowPos());
+                    SlotWindow.Update(slot, slotCategory, this.Data, ImGui.GetWindowPos(), buttonSize);
                 }
 
                 ImGui.PopStyleVar(2);
@@ -130,6 +119,19 @@ public class MainWindow
         SlotWindow.Draw();
 
         ImGui.End();
+    }
+
+    private unsafe Vector2 GetButtonPosition(AtkUnitBase* addon, AtkResNode* node, ItemSlot slot)
+    {
+        // Child nodes are all relative to their parent/addon, hence the seemingly random numbers ((246, 30) + (10, 48))
+        var position = ((new Vector2(256f + node->X, 78f + node->Y)
+                        + new Vector2((node->Height * 0.1f) + 0.5f)) * addon->Scale) + ImGui.GetStyle().FramePadding;
+
+        if (slot >= ItemSlot.Ears)
+            // Width of the underlying NineGrid node
+            position.X += 198f * addon->Scale;
+
+        return position;
     }
 
     // TODO: Move this out to a different file
