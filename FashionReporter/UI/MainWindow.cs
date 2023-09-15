@@ -77,22 +77,19 @@ public class MainWindow
             return;
         }
 
-        ImGui.SetWindowSize(new Vector2(addon->RootNode->Width * addon->Scale, addon->RootNode->Height * addon->Scale));
-        ImGui.SetWindowPos(new Vector2(addon->X, addon->Y));
-
         foreach (var slot in Enum.GetValues<ItemSlot>())
         {
             var slotCategory = "";
             var slotNodeID = 9 + (uint)slot;
             var atkValueIndex = 13 + ((int)slot * 11);
 
-            var childNode = innerNode->ChildNode->PrevSiblingNode;
             var slotNode = addon->GetNodeById(slotNodeID);
 
             var buttonSize = slotNode->Height * addon->Scale * 0.8f;
             ImGui.SetCursorPos(this.GetButtonPosition(addon, slotNode, slot));
 
             slotCategory = MemoryHelper.ReadSeStringNullTerminated(new nint(addon->AtkValues[atkValueIndex].String)).TextValue;
+            if (slotCategory == "") { continue; }
 
             // TODO: Proper sizing, global scale yada yada you know the deal already (applies to all elements so far)
             ImGui.BeginChild($"##child-{slot}", new Vector2(buttonSize));
