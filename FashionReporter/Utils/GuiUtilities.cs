@@ -5,8 +5,11 @@ using ImGuiNET;
 
 namespace FashionReporter.Utils;
 
-public static class Utilities
+public static class GuiUtilities
 {
+    public static Vector2 IconSize => new(ImGui.GetTextLineHeight() * 2f);
+    public static Vector2 SlotWindowSize => new((IconSize.X + ImGui.GetStyle().ItemSpacing.X) * 5f, (IconSize.Y + ImGui.GetStyle().ItemSpacing.Y) * 3.5f);
+
     public static unsafe Vector2 GetNodePosAbsolute(AtkUnitBase* addon, AtkResNode* node)
     {
         return new Vector2(node->X * addon->Scale, node->Y * addon->Scale);

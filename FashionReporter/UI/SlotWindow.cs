@@ -6,6 +6,8 @@ using ImGuiNET;
 using ImGuiScene;
 using Lumina.Excel.GeneratedSheets;
 
+using FashionReporter.Utils;
+
 namespace FashionReporter.UI;
 
 public class SlotWindow
@@ -38,7 +40,7 @@ public class SlotWindow
         {
             this.Slot = slot;
             this.Position = windowPos;
-            this.Position.X += (int)slot >= 5 ? 60 : -300;
+            this.Position.X += slot >= ItemSlot.Ears ? 60 : -GuiUtilities.SlotWindowSize.X;
 
             var category = data?.Find(x => x.Name == slotCategory!);
             if (category is not null)
@@ -53,10 +55,9 @@ public class SlotWindow
     {
         if (!this.IsOpen) { return; }
 
-        var windowSize = new Vector2(300, 200);
-        ImGui.SetNextWindowSize(windowSize);
+        ImGui.SetNextWindowSize(GuiUtilities.SlotWindowSize);
         ImGui.SetNextWindowPos(this.Position);
-        if (!ImGui.Begin($"##fashionreporter-item-display-{this.Slot}", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove))
+        if (!ImGui.Begin($"##fashionreporter-item-display-{this.Slot}", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize))
         {
             ImGui.End();
             return;
@@ -90,7 +91,7 @@ public class SlotWindow
 
     private void DrawItem(Item item)
     {
-        TextureWrap? icon = null;
+        TextureWrap? icon;
         if (this.Icons.TryGetValue(item.Icon, out var texture))
         {
             icon = texture;
@@ -103,14 +104,10 @@ public class SlotWindow
 
         if (icon is not null)
         {
-            ImGui.Image(icon.ImGuiHandle, new Vector2(48));  // Icon size. TODO: Global scaling
+            ImGui.Image(icon.ImGuiHandle, GuiUtilities.IconSize);
             ImGui.SameLine();
         }
 
-#if DEBUG
-        ImGui.Text($"[{item.RowId}]");
-        ImGui.SameLine();
-#endif
         ImGui.TextWrapped($"{item.Name}");
     }
 }

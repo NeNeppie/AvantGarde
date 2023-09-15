@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
@@ -87,10 +87,10 @@ public class MainWindow
 
             var childNode = innerNode->ChildNode->PrevSiblingNode;
             var slotNode = addon->GetNodeById(slotNodeID);
-            var position = Utilities.GetNodePosAbsolute(addon, childNode)
-                            + Utilities.GetNodePosAbsolute(addon, innerNode)
+            var position = GuiUtilities.GetNodePosAbsolute(addon, childNode)
+                            + GuiUtilities.GetNodePosAbsolute(addon, innerNode)
                             + new Vector2(slotNode->X * addon->Scale, slotNode->Y * addon->Scale);
-            if ((int)slot >= 5)
+            if (slot >= ItemSlot.Ears)
                 position += new Vector2((slotNode->Width * addon->Scale) - 60, 0);
             ImGui.SetCursorPos(position);
 
@@ -113,7 +113,7 @@ public class MainWindow
                 ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 3f);
                 ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 15f);
 
-                if (Utilities.IconButton(FontAwesomeIcon.List, new Vector2(60), "Show Gear"))
+                if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(60), "Show Gear"))
                 {
                     SlotWindow.Update(slot, slotCategory, this.Data, ImGui.GetWindowPos());
                 }
