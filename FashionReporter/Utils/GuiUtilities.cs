@@ -1,6 +1,5 @@
 using System.Numerics;
 using Dalamud.Interface;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 
 namespace FashionReporter.Utils;
