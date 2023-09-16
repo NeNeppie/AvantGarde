@@ -5,8 +5,8 @@ namespace FashionReporter.Data;
 public enum ItemSlot
 {
     Head,
-    Hands,
     Body,
+    Hands,
     Legs,
     Feet,
     Ears,

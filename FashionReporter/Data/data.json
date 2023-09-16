@@ -425,7 +425,7 @@
     },
     {
         "Name": "Up a Long Sleeve",
-        "IDs": []
+        "IDs": [13272, 13688, 21202, 21936, 21937]
     },
     {
         "Name": "Hingan Nights",
@@ -609,7 +609,7 @@
     },
     {
         "Name": "Feather in Your Cap",
-        "IDs": []
+        "IDs": [2825, 2829, 18547, 18553]
     },
     {
         "Name": "Traveling Light",
@@ -729,7 +729,7 @@
     },
     {
         "Name": "Check and Check",
-        "IDs": []
+        "IDs": [14942, 18166, 19625]
     },
     {
         "Name": "Storm of Blood",
