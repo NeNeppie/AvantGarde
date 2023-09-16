@@ -6,6 +6,7 @@ using ImGuiNET;
 using ImGuiScene;
 using Lumina.Excel.GeneratedSheets;
 
+using FashionReporter.Data;
 using FashionReporter.Utils;
 
 namespace FashionReporter.UI;
@@ -33,7 +34,7 @@ public class SlotWindow
         this.ItemsFiltered = this.Items;
     }
 
-    public void Update(ItemSlot slot, string slotCategory, List<Category>? data, Vector2 windowPos, float buttonSize)
+    public void Update(ItemSlot slot, Category? category, Vector2 windowPos, float buttonSize)
     {
         this.IsOpen = !this.IsOpen;
 
@@ -44,11 +45,10 @@ public class SlotWindow
             this.Position = windowPos;
             this.Position.X += slot >= ItemSlot.Ears ? buttonSize : -GuiUtilities.SlotWindowSize.X;
 
-            var category = data?.Find(x => x.Name == slotCategory!);
             if (category is not null)
             {
                 this.ItemsFiltered = this.Items
-                    .Where(item => MainWindow.IsMatchingSlot(item, slot) && category?.IDs.Contains((int)item.RowId) == true).ToList();
+                    .Where(item => slot.IsMatchingSlot(item) && category?.IDs.Contains((int)item.RowId) == true).ToList();
             }
         }
     }
@@ -65,13 +65,13 @@ public class SlotWindow
             return;
         }
 
-        ImGui.Text($"Fashion Reporter - {this.Slot}");
+        ImGui.Text($"Fashion Reporter - {this.Slot.GetDescription()}");
         ImGui.Separator();
 
         if (!this.ItemsFiltered.Any())
         {
             ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1f));
-            ImGui.TextWrapped("Text to be replaced with an explanation or something of the sort");
+            ImGui.TextWrapped("Text to be replaced with an explanation or something of the sort"); // TODO:
             ImGui.PopStyleColor();
             return;
         }

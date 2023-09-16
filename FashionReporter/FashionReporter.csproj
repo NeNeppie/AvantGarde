@@ -22,7 +22,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="data.json">
+        <Content Include="Data\data.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>

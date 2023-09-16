@@ -1,33 +1,17 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Text.Json;
 using Dalamud.Interface;
-using Dalamud.Logging;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 
+using FashionReporter.Data;
 using FashionReporter.Utils;
 
 namespace FashionReporter.UI;
-
-// TODO: Move this out to a different file
-public enum ItemSlot
-{
-    Head,
-    Hands,
-    Body,
-    Legs,
-    Feet,
-    Ears,
-    Neck,
-    Wrists,
-    RightRing,
-    LeftRing
-}
 
 public class Category
 {
@@ -44,24 +28,12 @@ public class MainWindow
 
     public MainWindow()
     {
-        // TODO: Reformat later?
-        var filePath = Path.Combine(Service.PluginInterface.AssemblyLocation.Directory?.FullName!, "data.json");
-        if (File.Exists(filePath))
-        {
-            var jsonString = File.ReadAllText(filePath);
-            this.Data = JsonSerializer.Deserialize<List<Category>>(jsonString);
-            if (this.Data is not null)
-            {
-                foreach (var cat in this.Data)
-                {
-                    PluginLog.Debug($"{cat.Name} - {string.Join(',', cat.IDs)}");
-                }
-            }
-        }
-        else
-        {
-            PluginLog.Error($"Couldn't find file {filePath}");
-        }
+        var filePath = Path.Combine(Service.PluginInterface.AssemblyLocation.Directory?.FullName!, "Data\\data.json");
+        if (!File.Exists(filePath))
+            throw new Exception("Unable to load data file.");
+
+        var jsonString = File.ReadAllText(filePath);
+        this.Data = JsonSerializer.Deserialize<List<Category>>(jsonString);
     }
 
     public unsafe void Draw(AtkUnitBase* addon)
@@ -105,7 +77,8 @@ public class MainWindow
                 ImGui.SetCursorPos(ImGui.GetStyle().FramePadding);
                 if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(buttonSize), "Show Gear"))
                 {
-                    SlotWindow.Update(slot, slotCategory, this.Data, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
+                    var category = this.Data?.Find(x => x.Name == slotCategory!);
+                    SlotWindow.Update(slot, category, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
                 }
 
                 ImGui.PopStyleVar(2);
@@ -121,32 +94,13 @@ public class MainWindow
     private unsafe Vector2 GetButtonPosition(AtkUnitBase* addon, AtkResNode* node, ItemSlot slot)
     {
         // Child nodes are all relative to their parent/addon, hence the seemingly random numbers ((246, 30) + (10, 48))
-        var position = ((new Vector2(256f + node->X, 78f + node->Y)
-                        + new Vector2((node->Height * 0.1f) + 0.5f)) * addon->Scale);
+        var position = (new Vector2(256f + node->X, 78f + node->Y)
+                        + new Vector2((node->Height * 0.1f) + 0.5f)) * addon->Scale;
 
         if (slot >= ItemSlot.Ears)
             // Width of the underlying NineGrid node
             position.X += 198f * addon->Scale;
 
         return position;
-    }
-
-    // TODO: Move this out to a different file
-    public static bool IsMatchingSlot(Item item, ItemSlot slot)
-    {
-        return slot switch
-        {
-            ItemSlot.Head => item.EquipSlotCategory.Value!.Head > 0,
-            ItemSlot.Hands => item.EquipSlotCategory.Value!.Gloves > 0,
-            ItemSlot.Body => item.EquipSlotCategory.Value!.Body > 0,
-            ItemSlot.Legs => item.EquipSlotCategory.Value!.Legs > 0,
-            ItemSlot.Feet => item.EquipSlotCategory.Value!.Feet > 0,
-            ItemSlot.Ears => item.EquipSlotCategory.Value!.Ears > 0,
-            ItemSlot.Neck => item.EquipSlotCategory.Value!.Neck > 0,
-            ItemSlot.Wrists => item.EquipSlotCategory.Value!.Wrists > 0,
-            ItemSlot.RightRing => item.EquipSlotCategory.Value!.FingerR > 0,
-            ItemSlot.LeftRing => item.EquipSlotCategory.Value!.FingerL > 0,
-            _ => false
-        };
     }
 }
