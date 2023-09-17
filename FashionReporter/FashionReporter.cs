@@ -1,4 +1,4 @@
-﻿using Dalamud.Plugin;
+using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 using FashionReporter.UI;
@@ -9,13 +9,11 @@ namespace FashionReporter
     {
         public string Name => "Fashion Reporter";
 
-        private MainWindow MainWindow;
+        private MainWindow MainWindow = new();
 
         public Plugin(DalamudPluginInterface pluginInterface)
         {
             pluginInterface.Create<Service>();
-
-            this.MainWindow = new MainWindow();
 
             Service.PluginInterface.UiBuilder.Draw += this.DrawUI;
         }

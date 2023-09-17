@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
-using System.Text.Json;
 using Dalamud.Interface;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -13,30 +11,12 @@ using FashionReporter.Utils;
 
 namespace FashionReporter.UI;
 
-public class Category
-{
-    public string Name { get; init; } = "";
-    public List<int> IDs { get; init; } = new();
-}
-
-public class MainWindow
+public unsafe class MainWindow
 {
     private static readonly SlotWindow SlotWindow = new();
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
 
-    private readonly List<Category>? Data;
-
-    public MainWindow()
-    {
-        var filePath = Path.Combine(Service.PluginInterface.AssemblyLocation.Directory?.FullName!, "Data\\data.json");
-        if (!File.Exists(filePath))
-            throw new Exception("Unable to load data file.");
-
-        var jsonString = File.ReadAllText(filePath);
-        this.Data = JsonSerializer.Deserialize<List<Category>>(jsonString);
-    }
-
-    public unsafe void Draw(AtkUnitBase* addon)
+    public void Draw(AtkUnitBase* addon)
     {
         if (addon->RootNode is null) { return; }
 
@@ -75,14 +55,20 @@ public class MainWindow
                 ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, buttonSize * 0.5f);
 
                 ImGui.SetCursorPos(ImGui.GetStyle().FramePadding);
-                if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(buttonSize), "Show Gear"))
+                try
                 {
-                    var category = this.Data?.Find(x => x.Name == slotCategory!);
-                    SlotWindow.Update(slot, category, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
+                    if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(buttonSize), "Show Gear"))
+                    {
+                        List<int>? itemIDs = new();
+                        Service.DataManager.Data.TryGetValue(slotCategory, out itemIDs);
+                        SlotWindow.Update(slot, itemIDs, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
+                    }
                 }
-
-                ImGui.PopStyleVar(2);
-                ImGui.PopStyleColor(4);
+                finally
+                {
+                    ImGui.PopStyleVar(2);
+                    ImGui.PopStyleColor(4);
+                }
             }
             ImGui.EndChild();
         }
@@ -91,7 +77,7 @@ public class MainWindow
         ImGui.End();
     }
 
-    private unsafe Vector2 GetButtonPosition(AtkUnitBase* addon, AtkResNode* node, ItemSlot slot)
+    private Vector2 GetButtonPosition(AtkUnitBase* addon, AtkResNode* node, ItemSlot slot)
     {
         // Child nodes are all relative to their parent/addon, hence the seemingly random numbers ((246, 30) + (10, 48))
         var position = (new Vector2(256f + node->X, 78f + node->Y)

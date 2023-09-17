@@ -26,7 +26,7 @@ public class SlotWindow
     public SlotWindow()
     {
         // Get all equipable items relevant for Fashion Report
-        this.Items = Service.DataManager.GetExcelSheet<Item>()!
+        this.Items = Service.DalamudDataManager.GetExcelSheet<Item>()!
             .Where(item => item.EquipSlotCategory.Row != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0
                                                            && item.EquipSlotCategory.Value!.MainHand == 0
                                                            && item.EquipSlotCategory.Value!.OffHand == 0).ToList();
@@ -34,7 +34,7 @@ public class SlotWindow
         this.ItemsFiltered = this.Items;
     }
 
-    public void Update(ItemSlot slot, Category? category, Vector2 windowPos, float buttonSize)
+    public void Update(ItemSlot slot, List<int>? itemIDs, Vector2 windowPos, float buttonSize)
     {
         this.IsOpen = !this.IsOpen;
 
@@ -45,10 +45,10 @@ public class SlotWindow
             this.Position = windowPos;
             this.Position.X += slot >= ItemSlot.Ears ? buttonSize : -GuiUtilities.SlotWindowSize.X;
 
-            if (category is not null)
+            if (itemIDs is not null)
             {
                 this.ItemsFiltered = this.Items
-                    .Where(item => slot.IsMatchingSlot(item) && category?.IDs.Contains((int)item.RowId) == true).ToList();
+                    .Where(item => slot.IsMatchingSlot(item) && itemIDs.Contains((int)item.RowId) == true).ToList();
             }
         }
     }
