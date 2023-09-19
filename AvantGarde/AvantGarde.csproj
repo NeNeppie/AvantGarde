@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Version>0.0.0.1</Version>
-        <PackageProjectUrl>https://github.com/NeNeppie/FashionReporter</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/NeNeppie/AvantGarde</PackageProjectUrl>
     </PropertyGroup>
 
     <PropertyGroup>

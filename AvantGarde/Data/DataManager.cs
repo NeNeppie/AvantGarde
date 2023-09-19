@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Dalamud.Logging;
 
-namespace FashionReporter.Data;
+namespace AvantGarde.Data;
 
 public class DataManager
 {

@@ -6,10 +6,10 @@ using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 
-using FashionReporter.Data;
-using FashionReporter.Utils;
+using AvantGarde.Data;
+using AvantGarde.Utils;
 
-namespace FashionReporter.UI;
+namespace AvantGarde.UI;
 
 public unsafe class MainWindow
 {
@@ -23,7 +23,7 @@ public unsafe class MainWindow
         ImGui.SetNextWindowSize(new Vector2(addon->RootNode->Width, addon->RootNode->Height) * addon->Scale);
         ImGui.SetNextWindowPos(new Vector2(addon->X, addon->Y));
         ImGuiHelpers.ForceNextWindowMainViewport();
-        if (!ImGui.Begin("Fashion Reporter", WindowFlags))
+        if (!ImGui.Begin("Avant-Garde", WindowFlags))
         {
             ImGui.End();
             return;

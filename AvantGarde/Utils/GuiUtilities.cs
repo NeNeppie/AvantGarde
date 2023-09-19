@@ -2,7 +2,7 @@ using System.Numerics;
 using Dalamud.Interface;
 using ImGuiNET;
 
-namespace FashionReporter.Utils;
+namespace AvantGarde.Utils;
 
 public static class GuiUtilities
 {

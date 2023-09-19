@@ -1,6 +1,6 @@
 using Lumina.Excel.GeneratedSheets;
 
-namespace FashionReporter.Data;
+namespace AvantGarde.Data;
 
 public enum ItemSlot
 {

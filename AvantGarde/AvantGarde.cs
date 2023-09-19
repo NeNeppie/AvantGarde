@@ -1,13 +1,13 @@
-using Dalamud.Plugin;
+﻿using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
-using FashionReporter.UI;
+using AvantGarde.UI;
 
-namespace FashionReporter
+namespace AvantGarde
 {
     public sealed class Plugin : IDalamudPlugin
     {
-        public string Name => "Fashion Reporter";
+        public string Name => "Avant-Garde";
 
         private MainWindow MainWindow = new();
 

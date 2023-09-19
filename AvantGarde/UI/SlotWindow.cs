@@ -6,10 +6,10 @@ using ImGuiNET;
 using ImGuiScene;
 using Lumina.Excel.GeneratedSheets;
 
-using FashionReporter.Data;
-using FashionReporter.Utils;
+using AvantGarde.Data;
+using AvantGarde.Utils;
 
-namespace FashionReporter.UI;
+namespace AvantGarde.UI;
 
 public class SlotWindow
 {
@@ -59,19 +59,21 @@ public class SlotWindow
 
         ImGui.SetNextWindowSize(GuiUtilities.SlotWindowSize);
         ImGui.SetNextWindowPos(this.Position);
-        if (!ImGui.Begin($"##fashionreporter-item-display-{this.Slot}", WindowFlags))
+        if (!ImGui.Begin($"##avantgarde-item-display-{this.Slot}", WindowFlags))
         {
             ImGui.End();
             return;
         }
 
-        ImGui.Text($"Fashion Reporter - {this.Slot.GetDescription()}");
+        ImGui.Text($"Avant-Garde: {this.Slot.GetDescription()}");
         ImGui.Separator();
 
         if (!this.ItemsFiltered.Any())
         {
             ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1f));
-            ImGui.TextWrapped("Text to be replaced with an explanation or something of the sort"); // TODO:
+            ImGui.TextWrapped("This category could be new, and/or is currently empty in the database.");
+            ImGui.Spacing();
+            ImGui.TextWrapped("If you wish to help expand the database, see the github page for more information.");
             ImGui.PopStyleColor();
             return;
         }

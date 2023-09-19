@@ -2,9 +2,9 @@ using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 
-using FashionReporter.Data;
+using AvantGarde.Data;
 
-namespace FashionReporter;
+namespace AvantGarde;
 
 internal sealed class Service
 {
