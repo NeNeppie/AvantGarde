@@ -3,6 +3,9 @@
 Avant-Garde is a Dalamud plugin aiming to provide a comprehensive list for all hint categories in the Fashion Report minigame.
 This plugin is a [crowdsourced project](#contributing), tracking gear pieces based on category and the slot they occupy.
 
+
+t
+
 <p align="center">
     <img src="Images/image1.png" width="400">
 </p>
