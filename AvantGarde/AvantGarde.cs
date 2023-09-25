@@ -1,4 +1,4 @@
-﻿using Dalamud.Plugin;
+using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 using AvantGarde.UI;
@@ -9,11 +9,12 @@ namespace AvantGarde
     {
         public string Name => "Avant-Garde";
 
-        private MainWindow MainWindow = new();
+        private MainWindow MainWindow;
 
         public Plugin(DalamudPluginInterface pluginInterface)
         {
             pluginInterface.Create<Service>();
+            this.MainWindow = new();
 
             Service.PluginInterface.UiBuilder.Draw += this.DrawUI;
         }
