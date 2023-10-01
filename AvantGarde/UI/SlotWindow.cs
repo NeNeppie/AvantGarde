@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Logging;
+using Dalamud.Interface.Internal;
 using ImGuiNET;
-using ImGuiScene;
 using Lumina.Excel.GeneratedSheets;
 
 using AvantGarde.Data;
@@ -19,7 +18,7 @@ public class SlotWindow
     private List<Item> ItemsFiltered;
     private ItemSlot Slot;
 
-    private Dictionary<ushort, TextureWrap> Icons = new();
+    private Dictionary<ushort, IDalamudTextureWrap> Icons = new();
     private Vector2 Position = new();
     private bool IsOpen = false;
 
@@ -30,7 +29,7 @@ public class SlotWindow
             .Where(item => item.EquipSlotCategory.Row != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0
                                                            && item.EquipSlotCategory.Value!.MainHand == 0
                                                            && item.EquipSlotCategory.Value!.OffHand == 0).ToList();
-        PluginLog.Debug($"Number of items loaded: {this.Items.Count}");
+        Service.PluginLog.Debug($"Number of items loaded: {this.Items.Count}");
         this.ItemsFiltered = this.Items;
     }
 
@@ -95,7 +94,7 @@ public class SlotWindow
 
     private void DrawItem(Item item)
     {
-        TextureWrap? icon;
+        IDalamudTextureWrap? icon;
         if (this.Icons.TryGetValue(item.Icon, out var texture))
         {
             icon = texture;

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Dalamud.Logging;
 
 namespace AvantGarde.Data;
 
@@ -34,10 +33,10 @@ public class DataManager
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStreamAsync();
-            PluginLog.Debug($"Sheet downloaded with status code {(int)response.StatusCode}");
+            Service.PluginLog.Debug($"Sheet downloaded with status code {(int)response.StatusCode}");
             return content;
         }
-        PluginLog.Error("Error getting spreadsheet data!");
+        Service.PluginLog.Error("Error getting spreadsheet data!");
         return Stream.Null;
     }
 
