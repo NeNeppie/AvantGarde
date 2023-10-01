@@ -24,8 +24,8 @@ You may contribute to the project by submitting gear pieces that match a certain
 
 A link to the data-tracker spreadsheet can be found [here](https://docs.google.com/spreadsheets/d/1b9NwL-Ba4tS0ROSy1_4HPfi7QSMQWuhXKqFSSY9Ovp4/edit?usp=sharing).
 
-## Todo
+## Todo / TBD
 
 -   Provide information on gear sources. Drop location? Cost from NPCs? Crafting requirement?
-
-_This is simply an idea, and not something I have on high priority. However, if demand is high enough for this feature I will get to work on it right away, so do let me know!_
+-   Automatic detection and submission of gear.
+-   Plugin Translations.
