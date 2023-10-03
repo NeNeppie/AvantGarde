@@ -14,7 +14,7 @@ namespace AvantGarde.UI;
 
 public unsafe class MainWindow
 {
-    private static readonly SlotWindow SlotWindow = new();
+    private readonly SlotWindow SlotWindow = new();
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
 
     public void Draw(AtkUnitBase* addon)
@@ -62,7 +62,7 @@ public unsafe class MainWindow
                     {
                         List<int>? itemIDs = new();
                         Service.DataManager.Data.TryGetValue(slotCategory, out itemIDs);
-                        SlotWindow.Update(slot, itemIDs, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
+                        this.SlotWindow.Update(slot, itemIDs, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
                     }
                 }
                 finally
@@ -73,7 +73,7 @@ public unsafe class MainWindow
             }
             ImGui.EndChild();
         }
-        SlotWindow.Draw();
+        this.SlotWindow.Draw();
 
         ImGui.End();
     }

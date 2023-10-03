@@ -7,8 +7,6 @@ namespace AvantGarde
 {
     public sealed class Plugin : IDalamudPlugin
     {
-        public string Name => "Avant-Garde";
-
         private MainWindow MainWindow;
 
         public Plugin(DalamudPluginInterface pluginInterface)
