@@ -20,7 +20,7 @@ It's worth noting that dyes are tied to the weekly theme, and thus cannot be pre
 
 ## Contributing
 
-You may contribute to the project by submitting gear pieces that match a certain category. You can fill the [Submission Form](https://forms.gle/hW9eFAvPm1ZkQFvG8), or reply to the forum post in the [Dalamud discord server](https://discord.gg/3NMcUV5) @ `#plugin-help-forum` _(will be made when/if the plugin gets accepted)_. Please attach a screenshot of the result screen to speed up the validation process.
+You may contribute to the project by submitting gear pieces that match a certain category. You can fill the [Submission Form](https://forms.gle/hW9eFAvPm1ZkQFvG8), or reply to the forum post in the [Dalamud discord server](https://discord.gg/3NMcUV5) @ `#plugin-help-forum` ([Here](https://discord.com/channels/581875019861328007/1166794253553381456/1166794253553381456)). Please attach a screenshot of the result screen to speed up the validation process.
 
 A link to the data-tracker spreadsheet can be found [here](https://docs.google.com/spreadsheets/d/1b9NwL-Ba4tS0ROSy1_4HPfi7QSMQWuhXKqFSSY9Ovp4/edit?usp=sharing).
 
