@@ -26,6 +26,5 @@ A link to the data-tracker spreadsheet can be found [here](https://docs.google.c
 
 ## Todo / TBD
 
--   Provide information on gear sources. Drop location? Cost from NPCs? Crafting requirement?
+-   Provide information on gear sources. Drop location? Cost from NPCs? Crafting requirement? (Incl. localization)
 -   Automatic detection and submission of gear.
--   Plugin Translations.
