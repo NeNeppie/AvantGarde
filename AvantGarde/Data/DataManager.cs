@@ -7,7 +7,7 @@ namespace AvantGarde.Data;
 
 public class DataManager
 {
-    public Dictionary<string, List<int>> Data = new();
+    public Dictionary<uint, List<int>> Data = new();
 
     private HttpClient Client = new();
     private static string SpreadsheetUrl =>
@@ -44,21 +44,20 @@ public class DataManager
     {
         using var reader = new StreamReader(stream);
 
-        int lineCount = 0;
         string? line;
-        while ((line = reader.ReadLine()) != null)
+        for (uint lineCount = 0; (line = reader.ReadLine()) != null; lineCount++)
         {
-            if (lineCount++ == 0) { continue; }
+            if (lineCount == 0) { continue; }
 
             var row = line.Split(',', 2);
 
-            this.Data[row[0]] = new();
+            this.Data[lineCount] = new();
             if (row[1] != "#N/A")
             {
                 var ids = row[1].Trim('"').Split(',');
                 foreach (var id in ids)
                 {
-                    this.Data[row[0]].Add(int.Parse(id));
+                    this.Data[lineCount].Add(int.Parse(id));
                 }
             }
         }

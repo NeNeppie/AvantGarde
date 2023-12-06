@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
 
 using AvantGarde.Data;
 using AvantGarde.Utils;
@@ -14,8 +16,9 @@ namespace AvantGarde.UI;
 
 public unsafe class MainWindow
 {
-    private readonly SlotWindow SlotWindow = new();
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
+
+    private readonly SlotWindow SlotWindow = new();
 
     public void Draw(AtkUnitBase* addon)
     {
@@ -41,7 +44,7 @@ public unsafe class MainWindow
             var buttonSize = slotNode->Height * addon->Scale * 0.8f;
             var buttonPos = this.GetButtonPosition(addon, slotNode, slot);
 
-            slotCategory = MemoryHelper.ReadSeStringNullTerminated(new nint(addon->AtkValues[atkValueIndex].String)).TextValue;
+            slotCategory = MemoryHelper.ReadSeStringNullTerminated((nint)addon->AtkValues[atkValueIndex].String).TextValue;
             if (slotCategory == "") { continue; }
 
             ImGui.SetCursorPos(buttonPos);
@@ -61,7 +64,7 @@ public unsafe class MainWindow
                     if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(buttonSize), "Show Gear"))
                     {
                         List<int>? itemIDs = new();
-                        Service.DataManager.Data.TryGetValue(slotCategory, out itemIDs);
+                        Service.DataManager.Data.TryGetValue(GetCategoryID(slotCategory), out itemIDs);
                         this.SlotWindow.Update(slot, itemIDs, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
                     }
                 }
@@ -89,5 +92,13 @@ public unsafe class MainWindow
             position.X += 198f * addon->Scale;
 
         return position;
+    }
+
+    private static uint GetCategoryID(string category)
+    {
+        var themeCategory = Service.DalamudDataManager.GetExcelSheet<FashionCheckThemeCategory>(Service.ClientState.ClientLanguage);
+        var matchingCategory = themeCategory?.FirstOrDefault(cat => cat.Name.RawString == category)
+            ?? throw new NullReferenceException();
+        return matchingCategory.RowId;
     }
 }
