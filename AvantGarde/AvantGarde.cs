@@ -9,7 +9,7 @@ namespace AvantGarde
     {
         private MainWindow MainWindow;
 
-        public Plugin(DalamudPluginInterface pluginInterface)
+        public Plugin(IDalamudPluginInterface pluginInterface)
         {
             pluginInterface.Create<Service>();
             this.MainWindow = new();

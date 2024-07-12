@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Interface.Internal;
+using Dalamud.Interface.Textures;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 
@@ -18,7 +18,6 @@ public class SlotWindow
     private List<Item> ItemsFiltered;
     private ItemSlot Slot;
 
-    private Dictionary<ushort, IDalamudTextureWrap> Icons = new();
     private Vector2 Position = new();
     private bool IsOpen = false;
 
@@ -94,21 +93,13 @@ public class SlotWindow
 
     private void DrawItem(Item item)
     {
-        IDalamudTextureWrap? icon;
-        if (this.Icons.TryGetValue(item.Icon, out var texture))
+        if (Service.TextureProvider.GetFromGameIcon(new GameIconLookup { IconId = item.Icon }).TryGetWrap(out var icon, out _))
         {
-            icon = texture;
-        }
-        else
-        {
-            icon = Service.TextureProvider.GetIcon(item.Icon);
-            this.Icons[item.Icon] = icon!;
-        }
-
-        if (icon is not null)
-        {
-            ImGui.Image(icon.ImGuiHandle, GuiUtilities.IconSize);
-            ImGui.SameLine();
+            if (icon is not null)
+            {
+                ImGui.Image(icon.ImGuiHandle, GuiUtilities.IconSize);
+                ImGui.SameLine();
+            }
         }
 
         ImGui.TextWrapped($"{item.Name}");
