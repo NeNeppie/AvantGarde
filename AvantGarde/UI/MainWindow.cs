@@ -22,11 +22,12 @@ public unsafe class MainWindow
 
     public void Draw(AtkUnitBase* addon)
     {
-        if (addon->RootNode is null) { return; }
-
-        ImGui.SetNextWindowSize(new Vector2(addon->RootNode->Width, addon->RootNode->Height) * addon->Scale);
-        ImGui.SetNextWindowPos(new Vector2(addon->X, addon->Y));
+        var windowPos = new Vector2(addon->X, addon->Y);
+        var windowSize = new Vector2(addon->RootNode->Width, addon->RootNode->Height) * addon->Scale;
         ImGuiHelpers.ForceNextWindowMainViewport();
+        ImGui.SetNextWindowSize(windowSize);
+        ImGui.SetNextWindowPos(windowPos + ImGuiHelpers.MainViewport.Pos);
+
         if (!ImGui.Begin("Avant-Garde", WindowFlags))
         {
             ImGui.End();

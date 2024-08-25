@@ -1,3 +1,4 @@
+using System;
 using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -24,9 +25,15 @@ namespace AvantGarde
 
         private unsafe void DrawUI()
         {
-            var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("FashionCheck");
-            if (addon is null || !addon->IsVisible) { return; }
-            this.MainWindow.Draw(addon);
+            var addon = Service.GameGui.GetAddonByName("FashionCheck");
+            if (addon != IntPtr.Zero)
+            {
+                var baseNode = (AtkUnitBase*)addon; 
+                if (baseNode->RootNode != null && baseNode->RootNode->IsVisible())
+                {
+                    this.MainWindow.Draw(baseNode);
+                }
+            }
         }
     }
 }
