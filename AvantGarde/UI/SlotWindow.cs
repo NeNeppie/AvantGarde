@@ -14,38 +14,33 @@ public class SlotWindow
 {
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
 
-    private readonly List<Item> Items;
-    private List<Item> ItemsFiltered;
-    private ItemSlot Slot;
-
-    private Vector2 Position = new();
-    private bool IsOpen = false;
+    private List<Item> _itemsFiltered;
+    private ItemSlot _slot;
+    private Vector2 _position = new();
+    private bool _isOpen = false;
 
     public SlotWindow()
     {
-        // Get all equipable items relevant for Fashion Report
-        this.Items = Service.DalamudDataManager.GetExcelSheet<Item>()!
-            .Where(item => item.EquipSlotCategory.Row != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0
-                                                           && item.EquipSlotCategory.Value!.MainHand == 0
-                                                           && item.EquipSlotCategory.Value!.OffHand == 0).ToList();
-        Service.PluginLog.Debug($"Number of items loaded: {this.Items.Count}");
-        this.ItemsFiltered = this.Items;
+        _itemsFiltered = Service.DataManager.Items;
     }
 
     public void Update(ItemSlot slot, List<int>? itemIDs, Vector2 windowPos, float buttonSize)
     {
-        this.IsOpen = !this.IsOpen;
+        if (slot == _slot && _isOpen)
+            _isOpen = false;
+        else
+            _isOpen = true;
 
-        this.ItemsFiltered = new();
-        if (this.IsOpen)
+        _itemsFiltered = [];
+        if (_isOpen)
         {
-            this.Slot = slot;
-            this.Position = windowPos;
-            this.Position.X += slot >= ItemSlot.Ears ? buttonSize : -GuiUtilities.SlotWindowSize.X;
+            _slot = slot;
+            _position = windowPos;
+            _position.X += slot >= ItemSlot.Ears ? buttonSize : -GuiUtilities.SlotWindowSize.X;
 
             if (itemIDs is not null)
             {
-                this.ItemsFiltered = this.Items
+                _itemsFiltered = Service.DataManager.Items
                     .Where(item => slot.IsMatchingSlot(item) && itemIDs.Contains((int)item.RowId) == true).ToList();
             }
         }
@@ -53,36 +48,36 @@ public class SlotWindow
 
     public unsafe void Draw()
     {
-        if (!this.IsOpen) { return; }
+        if (!_isOpen) { return; }
 
         ImGui.SetNextWindowSize(GuiUtilities.SlotWindowSize);
-        ImGui.SetNextWindowPos(this.Position);
-        if (!ImGui.Begin($"##avantgarde-item-display-{this.Slot}", WindowFlags))
+        ImGui.SetNextWindowPos(_position);
+        if (!ImGui.Begin($"##avantgarde-item-display-{_slot}", WindowFlags))
         {
             ImGui.End();
             return;
         }
 
-        ImGui.Text($"Avant-Garde: {this.Slot.GetDescription()}");
+        ImGui.Text($"Avant-Garde: {_slot.GetDescription()}");
         ImGui.Separator();
 
-        if (!this.ItemsFiltered.Any())
+        if (!_itemsFiltered.Any())
         {
             ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1f));
             ImGui.TextWrapped("This category could be new, and/or is currently empty in the database.");
             ImGui.Spacing();
-            ImGui.TextWrapped("If you wish to help expand the database, see the github page for more information.");
+            ImGui.TextWrapped("If you wish to help, see the github page for more information.");
             ImGui.PopStyleColor();
             return;
         }
 
         var clipper = new ImGuiListClipperPtr(ImGuiNative.ImGuiListClipper_ImGuiListClipper());
-        clipper.Begin(this.ItemsFiltered.Count);
+        clipper.Begin(_itemsFiltered.Count);
         while (clipper.Step())
         {
             for (var i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
             {
-                var item = this.ItemsFiltered[i];
+                var item = _itemsFiltered[i];
                 this.DrawItem(item);
             }
         }

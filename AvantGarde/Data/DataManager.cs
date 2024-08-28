@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Lumina.Excel.GeneratedSheets;
 
 namespace AvantGarde.Data;
 
@@ -28,7 +30,8 @@ TODO: Structure of FashionCheck AtkValues (as of Endwalker),
 
 public class DataManager
 {
-    public Dictionary<uint, List<int>> Data = new();
+    public readonly List<Item> Items;
+    public Dictionary<uint, List<int>> CategoryData = new();
 
     private HttpClient Client = new();
     private static string SpreadsheetUrl =>
@@ -36,6 +39,13 @@ public class DataManager
 
     public DataManager()
     {
+        // Get all equipable items relevant for Fashion Report
+        Items = Service.DalamudDataManager.GetExcelSheet<Item>()!
+            .Where(item => item.EquipSlotCategory.Row != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0
+                                                           && item.EquipSlotCategory.Value!.MainHand == 0
+                                                           && item.EquipSlotCategory.Value!.OffHand == 0).ToList();
+        Service.PluginLog.Debug($"Number of items loaded: {Items.Count}");
+
 #pragma warning disable CS4014
         this.PopulateData();
 #pragma warning restore CS4041
@@ -72,13 +82,13 @@ public class DataManager
 
             var row = line.Split(',', 2);
 
-            this.Data[lineCount] = new();
+            CategoryData[lineCount] = new();
             if (row[1] != "#N/A")
             {
                 var ids = row[1].Trim('"').Split(',');
                 foreach (var id in ids)
                 {
-                    this.Data[lineCount].Add(int.Parse(id));
+                    CategoryData[lineCount].Add(int.Parse(id));
                 }
             }
         }
