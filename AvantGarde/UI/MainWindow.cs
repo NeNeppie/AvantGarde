@@ -64,9 +64,9 @@ public unsafe class MainWindow
                 {
                     if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(buttonSize), "Show Gear"))
                     {
-                        List<int>? itemIDs = new();
+                        List<int>? itemIDs = [];
                         Service.DataManager.CategoryData.TryGetValue(GetCategoryID(slotCategory), out itemIDs);
-                        this.SlotWindow.Update(slot, itemIDs, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
+                        SlotWindow.Update(slot, itemIDs, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
                     }
                 }
                 finally
@@ -77,7 +77,7 @@ public unsafe class MainWindow
             }
             ImGui.EndChild();
         }
-        this.SlotWindow.Draw();
+        SlotWindow.Draw();
 
         ImGui.End();
     }

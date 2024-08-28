@@ -33,7 +33,7 @@ public class DataManager
     public readonly List<Item> Items;
     public Dictionary<uint, List<int>> CategoryData = new();
 
-    private HttpClient Client = new();
+    private HttpClient _client = new();
     private static string SpreadsheetUrl =>
         "https://docs.google.com/spreadsheets/d/e/2PACX-1vR26PTxSzanzniszYo3TROm7cxcRDlQclpS6PEHfFy498iiemAfmBK4uLNliQxaCV_huv7W_PAiIB4S/pub?output=csv";
 
@@ -47,7 +47,7 @@ public class DataManager
         Service.PluginLog.Debug($"Number of items loaded: {Items.Count}");
 
 #pragma warning disable CS4014
-        this.PopulateData();
+        PopulateData();
 #pragma warning restore CS4041
     }
 
@@ -60,7 +60,7 @@ public class DataManager
 
     private async Task<Stream> HttpGetStream(string url)
     {
-        var response = await Client.GetAsync(url);
+        var response = await _client.GetAsync(url);
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStreamAsync();

@@ -8,12 +8,12 @@ namespace AvantGarde
 {
     public sealed class Plugin : IDalamudPlugin
     {
-        private MainWindow MainWindow;
+        private MainWindow _mainWindow;
 
         public Plugin(IDalamudPluginInterface pluginInterface)
         {
             pluginInterface.Create<Service>();
-            this.MainWindow = new();
+            _mainWindow = new();
 
             Service.PluginInterface.UiBuilder.Draw += this.DrawUI;
         }
@@ -28,10 +28,10 @@ namespace AvantGarde
             var addon = Service.GameGui.GetAddonByName("FashionCheck");
             if (addon != IntPtr.Zero)
             {
-                var baseNode = (AtkUnitBase*)addon; 
+                var baseNode = (AtkUnitBase*)addon;
                 if (baseNode->RootNode != null && baseNode->RootNode->IsVisible())
                 {
-                    this.MainWindow.Draw(baseNode);
+                    _mainWindow.Draw(baseNode);
                 }
             }
         }
