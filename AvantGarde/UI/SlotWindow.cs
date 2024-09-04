@@ -78,7 +78,7 @@ public class SlotWindow
             for (var i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
             {
                 var item = _itemsFiltered[i];
-                this.DrawItem(item);
+                DrawItem(item, showIDs: false, canInteract: true);
             }
         }
         clipper.End();
@@ -86,8 +86,18 @@ public class SlotWindow
         ImGui.End();
     }
 
-    private void DrawItem(Item item)
+    public static void DrawItem(Item item, bool showIDs, bool canInteract)
     {
+        if (canInteract)
+        {
+            if (ImGui.Selectable($"##avantgarde-popup-select-{item.RowId}", false, ImGuiSelectableFlags.None, new Vector2(GuiUtilities.SlotWindowSize.X, GuiUtilities.IconSize.Y))
+                && (ImGui.IsMouseReleased(ImGuiMouseButton.Left) || ImGui.IsMouseReleased(ImGuiMouseButton.Right)))
+            {
+                ImGui.OpenPopup($"##avantgarde-item-popup-{item.RowId}");
+            }
+            ImGui.SetCursorPosY(ImGui.GetCursorPosY() - GuiUtilities.IconSize.Y - ImGui.GetStyle().FramePadding.Y);
+        }
+
         if (Service.TextureProvider.GetFromGameIcon(new GameIconLookup { IconId = item.Icon }).TryGetWrap(out var icon, out _))
         {
             if (icon is not null)
@@ -97,6 +107,13 @@ public class SlotWindow
             }
         }
 
-        ImGui.TextWrapped($"{item.Name}");
+        var itemName = item.Name.ToString();
+        if (showIDs)
+        {
+            itemName = $"[{item.RowId}] " + itemName;
+        }
+        ImGui.TextWrapped(itemName);
+
+        ItemPopupWindow.Draw(item);
     }
 }
