@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace AvantGarde.Data;
 
@@ -41,9 +41,9 @@ public class DataManager
     {
         // Get all equipable items relevant for Fashion Report
         Items = Service.DalamudDataManager.GetExcelSheet<Item>()!
-            .Where(item => item.EquipSlotCategory.Row != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0
-                                                           && item.EquipSlotCategory.Value!.MainHand == 0
-                                                           && item.EquipSlotCategory.Value!.OffHand == 0).ToList();
+            .Where(item => item.EquipSlotCategory.RowId != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0
+                                                             && item.EquipSlotCategory.Value!.MainHand == 0
+                                                             && item.EquipSlotCategory.Value!.OffHand == 0).ToList();
         Service.PluginLog.Debug($"Number of items loaded: {Items.Count}");
 
 #pragma warning disable CS4014

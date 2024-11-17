@@ -7,7 +7,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 using AvantGarde.Data;
 using AvantGarde.Utils;
@@ -98,7 +98,7 @@ public unsafe class MainWindow
     private static uint GetCategoryID(string category)
     {
         var themeCategory = Service.DalamudDataManager.GetExcelSheet<FashionCheckThemeCategory>(Service.ClientState.ClientLanguage);
-        var matchingCategory = themeCategory?.FirstOrDefault(cat => cat.Name.RawString == category)
+        var matchingCategory = themeCategory?.FirstOrDefault(cat => cat.Name.ExtractText() == category)
             ?? throw new NullReferenceException();
         return matchingCategory.RowId;
     }

@@ -1,26 +1,50 @@
 using System.Diagnostics;
+using System.Numerics;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
+
+using AvantGarde.Utils;
 
 namespace AvantGarde.UI;
 
 public static class ItemPopupWindow
 {
+    private const ushort SourceTypeIconGil          = 061758;
+    private const ushort SourceTypeIconAchievement  = 061767;
+    private const ushort SourceTypeIconDungeon      = 061801;
+    private const ushort SourceTypeIconRaid         = 061802;
+    private const ushort SourceTypeIconTrial        = 061804;
+    private const ushort SourceTypeIconQuestionMark = 061807;
+    private const ushort SourceTypeIconTreasure     = 061808;
+    private const ushort SourceTypeIconFate         = 061809;
+    private const ushort SourceTypeIconTribe        = 061814;
+    private const ushort SourceTypeIconGathering    = 061815;
+    private const ushort SourceTypeIconCrafting     = 061816;
+    private const ushort SourceTypeIconHunt         = 061819;
+    private const ushort SourceTypeIconMGP          = 061820;
+    private const ushort SourceTypeIconMogstore     = 061831;
+    private const ushort SourceTypeIconFieldOps     = 061837;
+    private const ushort SourceTypeIconQuest        = 061839;
+    private const ushort SourceTypeIconExchange     = 061843;
+    private const ushort SourceTypeIconIsland       = 061847;
+
     public static unsafe void Draw(Item item)
     {
-        if (item == null)
-            return;
-
         if (!ImGui.BeginPopup($"##avantgarde-item-popup-{item.RowId}"))
             return;
 
-        ImGui.TextUnformatted(item.Name);
+        ImGui.TextUnformatted(item.Name.ExtractText());
         ImGui.Separator();
 
-        ImGui.Text($"Equippable by: {item.ClassJobCategory.Value?.Name}");
-        ImGui.TextUnformatted("");
+        ImGui.Text($"Equippable by: {item.ClassJobCategory.Value.Name}");
+        ImGui.Spacing();
+
+        DrawGameIcon(SourceTypeIconQuestionMark, GuiUtilities.IconSize);
+        ImGui.SameLine();
+        ImGui.Text("Unknown Source!\nWork In Progress...");
+        ImGui.Spacing();
 
         if (ImGui.Selectable("Try On"))
             AgentTryon.TryOn(0, item.RowId);
@@ -32,7 +56,7 @@ public static class ItemPopupWindow
             LinkItem(item);
 
         if (ImGui.Selectable("Copy Name"))
-            ImGui.SetClipboardText(item.Name.RawString);
+            ImGui.SetClipboardText(item.Name.ExtractText());
 
         if (ImGui.Selectable("Open in Garland Tools"))
             Process.Start(new ProcessStartInfo { FileName = $"https://garlandtools.org/db/#item/{item.RowId}", UseShellExecute = true });
@@ -59,10 +83,20 @@ public static class ItemPopupWindow
 
         agentChatLog->LinkedItem.ItemId = item.RowId;
         agentChatLog->LinkedItem.Quantity = 1;
-        agentChatLog->LinkedItemName.SetString(item.Name.RawString);
+        agentChatLog->LinkedItemName.SetString(item.Name.ExtractText());
         agentChatLog->LinkedItemQuality = item.Rarity;
 
         // 1096 is the ID for <item>
         agentChatLog->InsertTextCommandParam(1096, true);
+    }
+
+    private static void DrawGameIcon(ushort id, Vector2 size)
+    {
+        var icon = Service.TextureProvider.GetFromGameIcon(new(id));
+
+        if (icon.TryGetWrap(out var texture, out _))
+        {
+            ImGui.Image(texture.ImGuiHandle, size, Vector2.Zero, Vector2.One, Vector4.One);
+        }
     }
 }

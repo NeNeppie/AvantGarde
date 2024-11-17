@@ -3,7 +3,7 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Textures;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 using AvantGarde.Data;
 using AvantGarde.Utils;
@@ -107,7 +107,7 @@ public class SlotWindow
             }
         }
 
-        var itemName = item.Name.ToString();
+        var itemName = item.Name.ExtractText();
         if (showIDs)
         {
             itemName = $"[{item.RowId}] " + itemName;
