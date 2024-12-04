@@ -7,7 +7,7 @@ namespace AvantGarde.Utils;
 public static class GuiUtilities
 {
     public static Vector2 IconSize => new(ImGui.GetTextLineHeight() * 2f);
-    public static Vector2 SlotWindowSize => new((IconSize.X + ImGui.GetStyle().ItemSpacing.X) * 5.7f, (IconSize.Y + ImGui.GetStyle().ItemSpacing.Y) * 6f);
+    public static Vector2 SlotWindowSize => new(ImGui.CalcTextSize("A").X * 30f, (IconSize.Y + ImGui.GetStyle().ItemSpacing.Y) * 6f);
 
     public static bool IconButton(FontAwesomeIcon icon, Vector2 size = default, string? tooltip = null, bool small = false)
     {
