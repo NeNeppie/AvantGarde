@@ -68,6 +68,8 @@ public class SlotWindow
             ImGui.Spacing();
             ImGui.TextWrapped("If you wish to help, see the github page for more information.");
             ImGui.PopStyleColor();
+
+            ImGui.End();
             return;
         }
 
