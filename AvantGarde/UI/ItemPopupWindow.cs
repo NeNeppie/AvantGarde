@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
+using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using ImGuiNET;
@@ -32,8 +33,8 @@ public static class ItemPopupWindow
 
     public static unsafe void Draw(Item item)
     {
-        if (!ImGui.BeginPopup($"##avantgarde-item-popup-{item.RowId}"))
-            return;
+        using var popup = ImRaii.Popup($"##avantgarde-item-popup-{item.RowId}");
+        if (!popup) return;
 
         ImGui.TextUnformatted(item.Name.ExtractText());
         ImGui.Separator();
@@ -73,8 +74,6 @@ public static class ItemPopupWindow
         //      * Achievement Claim
         //      * Retainer Ventures (Rare ARR gear exclusive to Ventures)
         //      * Eureka & Bozja Lockboxes
-
-        ImGui.EndPopup();
     }
 
     private static unsafe void LinkItem(Item item)

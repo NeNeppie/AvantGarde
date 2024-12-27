@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility;
+using Dalamud.Interface.Utility.Raii;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
@@ -26,7 +27,7 @@ public unsafe class MainWindow
         var windowSize = new Vector2(addon->RootNode->Width, addon->RootNode->Height) * addon->Scale;
         ImGuiHelpers.ForceNextWindowMainViewport();
         ImGui.SetNextWindowSize(windowSize);
-        ImGui.SetNextWindowPos(windowPos + ImGuiHelpers.MainViewport.Pos);
+        ImGuiHelpers.SetNextWindowPosRelativeMainViewport(windowPos);
 
         if (!ImGui.Begin("Avant-Garde", WindowFlags))
         {
@@ -49,15 +50,16 @@ public unsafe class MainWindow
             if (slotCategory == "") { continue; }
 
             ImGui.SetCursorPos(buttonPos);
-            ImGui.BeginChild($"##child-{slot}", new Vector2(buttonSize * 1.15f));
+            using var child = ImRaii.Child($"##child-{slot}", new Vector2(buttonSize * 1.15f));
+            if (child)
             {
-                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f));
-                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.3f, 0.3f, 0.7f));
-                ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f));
-                ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f));
+                using var color = ImRaii.PushColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f))
+                                        .Push(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.3f, 0.3f, 0.7f))
+                                        .Push(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f))
+                                        .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f));
 
-                ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 2f);
-                ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, buttonSize * 0.5f);
+                using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2f)
+                                        .Push(ImGuiStyleVar.FrameRounding, buttonSize * 0.5f);
 
                 ImGui.SetCursorPos(ImGui.GetStyle().FramePadding);
                 try
@@ -69,13 +71,10 @@ public unsafe class MainWindow
                         SlotWindow.Update(slot, itemIDs, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
                     }
                 }
-                finally
-                {
-                    ImGui.PopStyleVar(2);
-                    ImGui.PopStyleColor(4);
+                catch (Exception e) when (e is ArgumentNullException || e is NullReferenceException) {
+                    Service.PluginLog.Error(e, $"Exception {e.GetType} while updating hint window with category: {slotCategory} for slot: {slot}");
                 }
             }
-            ImGui.EndChild();
         }
         SlotWindow.Draw();
 

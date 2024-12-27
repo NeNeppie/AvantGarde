@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Textures;
+using Dalamud.Interface.Utility;
+using Dalamud.Interface.Utility.Raii;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
 
@@ -52,6 +54,7 @@ public class SlotWindow
 
         ImGui.SetNextWindowSize(GuiUtilities.SlotWindowSize);
         ImGui.SetNextWindowPos(_position);
+
         if (!ImGui.Begin($"##avantgarde-item-display-{_slot}", WindowFlags))
         {
             ImGui.End();
@@ -63,27 +66,18 @@ public class SlotWindow
 
         if (!_itemsFiltered.Any())
         {
-            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1f));
-            ImGui.TextWrapped("This category could be new, and/or is currently empty in the database.");
-            ImGui.Spacing();
-            ImGui.TextWrapped("If you wish to help, see the github page for more information.");
-            ImGui.PopStyleColor();
+            using (ImRaii.PushColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1f)))
+            {
+                ImGui.TextWrapped("This category could be new, and/or is currently empty in the database.");
+                ImGui.Spacing();
+                ImGui.TextWrapped("If you wish to help, see the github page for more information.");
+            }
 
             ImGui.End();
             return;
         }
 
-        var clipper = new ImGuiListClipperPtr(ImGuiNative.ImGuiListClipper_ImGuiListClipper());
-        clipper.Begin(_itemsFiltered.Count);
-        while (clipper.Step())
-        {
-            for (var i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
-            {
-                var item = _itemsFiltered[i];
-                DrawItem(item, showIDs: false, canInteract: true);
-            }
-        }
-        clipper.End();
+        ImGuiClip.ClippedDraw(_itemsFiltered, item => DrawItem(item, showIDs: false, canInteract: true), GuiUtilities.IconSize.Y + ImGui.GetStyle().ItemSpacing.Y);
 
         ImGui.End();
     }
