@@ -5,7 +5,6 @@ using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
@@ -46,7 +45,7 @@ public unsafe class MainWindow
             var buttonSize = slotNode->Height * addon->Scale * 0.8f;
             var buttonPos = this.GetButtonPosition(addon, slotNode, slot);
 
-            slotCategory = MemoryHelper.ReadSeStringNullTerminated((nint)addon->AtkValues[atkValueIndex].String).TextValue;
+            slotCategory = addon->AtkValues[atkValueIndex].String.ToString();
             if (slotCategory == "") { continue; }
 
             ImGui.SetCursorPos(buttonPos);
