@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 using AvantGarde.Data;
@@ -98,7 +98,7 @@ public class SlotWindow
         {
             if (icon is not null)
             {
-                ImGui.Image(icon.ImGuiHandle, GuiUtilities.IconSize);
+                ImGui.Image(icon.Handle, GuiUtilities.IconSize);
                 ImGui.SameLine();
             }
         }

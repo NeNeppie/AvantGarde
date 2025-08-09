@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 
 using AvantGarde.Data;
@@ -70,7 +70,8 @@ public unsafe class MainWindow
                         SlotWindow.Update(slot, itemIDs, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
                     }
                 }
-                catch (Exception e) when (e is ArgumentNullException || e is NullReferenceException) {
+                catch (Exception e) when (e is ArgumentNullException || e is NullReferenceException)
+                {
                     Service.PluginLog.Error(e, $"Exception {e.GetType} while updating hint window with category: {slotCategory} for slot: {slot}");
                 }
             }

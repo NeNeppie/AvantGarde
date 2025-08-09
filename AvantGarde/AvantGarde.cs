@@ -28,7 +28,7 @@ namespace AvantGarde
             var addon = Service.GameGui.GetAddonByName("FashionCheck");
             if (addon != IntPtr.Zero)
             {
-                var baseNode = (AtkUnitBase*)addon;
+                var baseNode = (AtkUnitBase*)addon.Address;
                 if (baseNode->RootNode != null && baseNode->RootNode->IsVisible())
                 {
                     _mainWindow.Draw(baseNode);
