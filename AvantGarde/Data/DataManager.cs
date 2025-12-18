@@ -67,7 +67,7 @@ public class DataManager
             Service.PluginLog.Debug($"Sheet downloaded with status code {(int)response.StatusCode}");
             return content;
         }
-        Service.PluginLog.Error("Error getting spreadsheet data!");
+        Service.PluginLog.Error($"Error getting spreadsheet data! {response.ReasonPhrase}");
         return Stream.Null;
     }
 
