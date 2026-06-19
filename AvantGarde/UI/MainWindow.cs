@@ -1,13 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.Sheets;
 
 using AvantGarde.Data;
 using AvantGarde.Utils;
@@ -16,14 +14,19 @@ namespace AvantGarde.UI;
 
 public unsafe class MainWindow
 {
+    public AtkUnitBase* Addon = null;
+    public FashionCheckAtk? AtkData = null;
+
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
 
     private readonly SlotWindow SlotWindow = new();
 
-    public void Draw(AtkUnitBase* addon)
+    public void Draw()
     {
-        var windowPos = new Vector2(addon->X, addon->Y);
-        var windowSize = new Vector2(addon->RootNode->Width, addon->RootNode->Height) * addon->Scale;
+        if (Addon is null || AtkData is null) { return; }
+
+        var windowPos = new Vector2(Addon->X, Addon->Y);
+        var windowSize = new Vector2(Addon->RootNode->Width, Addon->RootNode->Height) * Addon->Scale;
         ImGuiHelpers.ForceNextWindowMainViewport();
         ImGui.SetNextWindowSize(windowSize);
         ImGuiHelpers.SetNextWindowPosRelativeMainViewport(windowPos);
@@ -36,17 +39,14 @@ public unsafe class MainWindow
 
         foreach (var slot in Enum.GetValues<ItemSlot>())
         {
-            var slotCategory = "";
+            var slotCategory = AtkData.Slots[(int)slot + 1].Hint;
             var slotNodeID = 9 + (uint)slot;
-            var atkValueIndex = 13 + ((int)slot * 11);
+            var slotNode = Addon->GetNodeById(slotNodeID);
 
-            var slotNode = addon->GetNodeById(slotNodeID);
+            var buttonSize = slotNode->Height * Addon->Scale * 0.8f;
+            var buttonPos = this.GetButtonPosition(Addon, slotNode, slot);
 
-            var buttonSize = slotNode->Height * addon->Scale * 0.8f;
-            var buttonPos = this.GetButtonPosition(addon, slotNode, slot);
-
-            slotCategory = addon->AtkValues[atkValueIndex].String.ToString();
-            if (slotCategory == "") { continue; }
+            if (!AtkData.Slots[(int)slot + 1].IsActive) { continue; }
 
             ImGui.SetCursorPos(buttonPos);
             using var child = ImRaii.Child($"##child-{slot}", new Vector2(buttonSize * 1.15f));
@@ -66,7 +66,7 @@ public unsafe class MainWindow
                     if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(buttonSize), "Show Gear"))
                     {
                         List<int>? itemIDs = [];
-                        Service.DataManager.CategoryData.TryGetValue(GetCategoryID(slotCategory), out itemIDs);
+                        Service.DataManager.CategoryData.TryGetValue(DataManager.GetCategoryID(slotCategory), out itemIDs);
                         SlotWindow.Update(slot, itemIDs, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
                     }
                 }
@@ -92,13 +92,5 @@ public unsafe class MainWindow
             position.X += 198f * addon->Scale;
 
         return position;
-    }
-
-    private static uint GetCategoryID(string category)
-    {
-        var themeCategory = Service.DalamudDataManager.GetExcelSheet<FashionCheckThemeCategory>(Service.ClientState.ClientLanguage);
-        var matchingCategory = themeCategory?.FirstOrDefault(cat => cat.Name.ExtractText() == category)
-            ?? throw new NullReferenceException();
-        return matchingCategory.RowId;
     }
 }

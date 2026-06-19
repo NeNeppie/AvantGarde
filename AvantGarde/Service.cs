@@ -14,6 +14,7 @@ internal sealed class Service
     [PluginService] public static ITextureProvider TextureProvider { get; private set; } = null!;
     [PluginService] public static IPluginLog PluginLog { get; private set; } = null!;
     [PluginService] public static IClientState ClientState { get; private set; } = null!;
+    [PluginService] public static IAddonLifecycle AddonLifecycle {get; private set; } = null!;
 
     public static DataManager DataManager { get; set; } = null!;
 

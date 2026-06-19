@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,27 +7,6 @@ using System.Threading.Tasks;
 using Lumina.Excel.Sheets;
 
 namespace AvantGarde.Data;
-
-/*
-TODO: Structure of FashionCheck AtkValues (as of Endwalker), 
-    for future automatic submission implementation:
-    [0] Weekly Theme
-    [1] Sub-struct for every gear piece
-        [0] Bool - Hint active
-        [1] String - Hint
-------> [2] UInt - Score stamp (0 is Gold, 4 is Low, 5 is None)
-        [3] UInt - unk
-        [4] String - Slot
-        [5] UInt - unk
-        [6] UInt - unk
-------> [7] UInt - Dye ID
-        [8] UInt - unk (Connected to dye)
-        [9] Bool - unk
-        [10] Bool - unk
-    [122] Remaining Attempts
-    [123] High Score
-    [124-132] Irrelevant
-*/
 
 public class DataManager
 {
@@ -92,6 +72,14 @@ public class DataManager
                 }
             }
         }
+    }
+
+    public static uint GetCategoryID(string category)
+    {
+        var themeCategory = Service.DalamudDataManager.GetExcelSheet<FashionCheckThemeCategory>(Service.ClientState.ClientLanguage);
+        var matchingCategory = themeCategory?.FirstOrDefault(cat => cat.Name.ExtractText() == category)
+            ?? throw new NullReferenceException();
+        return matchingCategory.RowId;
     }
 }
 
