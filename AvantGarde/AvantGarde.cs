@@ -24,27 +24,30 @@ namespace AvantGarde
             Service.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "FashionCheck", (type, args) =>
             {
                 var atkValues = new Span<AtkValue>((AtkValue*)((AddonSetupArgs)args).AtkValues, args.Addon.AtkValuesCount);
+                if (atkValues.Length != FashionCheckAtk.AtkValueCount)
+                {
+                    Service.PluginLog.Error("Failure to initialize window - AtkValues count mismatch");
+                    return;
+                }
+
                 var atkData = new FashionCheckAtk(atkValues);
+                var scoreGaugeAddon = Service.GameGui.GetAddonByName("FashionCheckScoreGauge");
+                if (scoreGaugeAddon != IntPtr.Zero)
+                {
+                    var score = ((AtkUnitBase*)scoreGaugeAddon.Address)->AtkValues[0].UInt;
+                    ExportFashionAttempt(atkData, score);
+                }
 
                 _mainWindow.Addon = (AtkUnitBase*)args.Addon.Address;
                 _mainWindow.AtkData = atkData;
-
-                // DEBUG: Move somewhere else when uploading logic is implemeneted
-                var scoreGaugeAddon = Service.GameGui.GetAddonByName("FashionCheckScoreGauge");
-                if (scoreGaugeAddon != IntPtr.Zero) {
-                    foreach (var item in atkData.GetGoldStamps()) {
-                        // Should compare to existing data?
-                        Service.PluginLog.Info($"Gold Stamp Found: {item}");
-                    }
-                }
                 _drawUi = true;
             });
 
-            Service.AddonLifecycle.RegisterListener(AddonEvent.PreClose, "FashionCheck", (type, args) => 
-            { 
+            Service.AddonLifecycle.RegisterListener(AddonEvent.PreClose, "FashionCheck", (type, args) =>
+            {
                 _mainWindow.Addon = null;
                 _mainWindow.AtkData = null;
-                _drawUi = false; 
+                _drawUi = false;
             });
         }
 
@@ -53,6 +56,16 @@ namespace AvantGarde
             Service.PluginInterface.UiBuilder.Draw -= this.DrawUI;
             Service.AddonLifecycle.UnregisterListener(AddonEvent.PreClose, "FashionCheck");
             Service.AddonLifecycle.UnregisterListener(AddonEvent.PostSetup, "FashionCheck");
+        }
+
+        private void ExportFashionAttempt(FashionCheckAtk atk, uint score)
+        {
+            var exportObj = atk.Export();
+            exportObj.WeekNum = DataManager.GetWeekNumFromTheme(atk.WeeklyTheme);
+            exportObj.Score = score;
+
+            UploadManager.UploadRow upload = new(exportObj);
+            UploadManager.Upload(upload);
         }
 
         private void DrawUI()

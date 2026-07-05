@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Lumina.Excel.Sheets;
+using Newtonsoft.Json;
 
 namespace AvantGarde.Data;
 
@@ -74,12 +75,112 @@ public class DataManager
         }
     }
 
+    /// <summary>
+    /// Returns the corresponding row ID of a category name.
+    /// </summary>
+    /// <param name="category">Category name in client language</param>
+    /// <returns></returns>
+    /// <exception cref="NullReferenceException"></exception>
     public static uint GetCategoryID(string category)
     {
         var themeCategory = Service.DalamudDataManager.GetExcelSheet<FashionCheckThemeCategory>(Service.ClientState.ClientLanguage);
         var matchingCategory = themeCategory?.FirstOrDefault(cat => cat.Name.ExtractText() == category)
             ?? throw new NullReferenceException();
         return matchingCategory.RowId;
+    }
+
+    /// <summary>
+    /// Returns the corresponding row ID of a weekly theme name.
+    /// Subtract by 9 to get the week number this theme ran on.
+    /// </summary>
+    /// <param name="weeklyTheme">Weekly theme name in client language</param>
+    /// <returns></returns>
+    /// <exception cref="NullReferenceException"></exception>
+    public static uint GetWeeklyThemeID(string weeklyTheme)
+    {
+        var sheet = Service.DalamudDataManager.GetExcelSheet<FashionCheckWeeklyTheme>(Service.ClientState.ClientLanguage);
+        var matchingRow = sheet?.FirstOrDefault(theme => theme.Name.ExtractText() == weeklyTheme)
+            ?? throw new NullReferenceException();
+        return matchingRow.RowId;
+    }
+
+    public static uint GetWeekNumFromTheme(string weeklyTheme) => GetWeeklyThemeID(weeklyTheme) - 9;
+}
+
+public class Export
+{
+    public uint WeekNum;
+    public uint Score;
+    public List<Category> Categories = [];
+    public List<uint> ItemIds = [];
+    public List<uint> StainIds = [];
+}
+
+public record Category(uint HintId, uint StampId)
+{
+    public uint[] Coupled() => [HintId, StampId];
+};
+
+public class UploadManager
+{
+    private const string UrlBase = "https://infi.ovh/api/";
+    private const string AnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.Ur6wgi_rD4dr3uLLvbLoaEvfLCu4QFWdrF-uHRtbl_s";
+
+    private HttpClient _client = new();
+
+    public UploadManager()
+    {
+        _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {AnonKey}");
+        _client.DefaultRequestHeaders.Add("Prefer", "return=minimal");
+    }
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    public class UploadRow
+    {
+        [JsonProperty("version")]
+        public string Version = Service.PluginInterface.Manifest.AssemblyVersion.ToString();
+
+        [JsonProperty("plugin")]
+        public uint Plugin = 1;
+
+        [JsonProperty("week_num")]
+        public uint WeekNum;
+
+        [JsonProperty("score")]
+        public uint Score;
+
+        [JsonProperty("hints")]
+        public uint[] Hints;
+
+        [JsonProperty("items")]
+        public uint[] Items;
+
+        [JsonProperty("dyes")]
+        public uint[] Dyes;
+
+        public UploadRow(Export export)
+        {
+            WeekNum = export.WeekNum;
+            Score = export.Score;
+
+            Hints = export.Categories.SelectMany(cat => cat.Coupled()).ToArray();
+            Items = export.ItemIds.ToArray();
+            Dyes = export.StainIds.ToArray();
+        }
+    }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+
+    public static async void Upload(UploadRow entry)
+    {
+        // DEBUG
+        var fields = entry.GetType().GetFields();
+        foreach (var field in fields)
+        {
+            var name = field.Name;
+            var value = field.FieldType.IsArray ? $"{{{string.Join(", ", (uint[])field.GetValue(entry))}}}" : field.GetValue(entry);
+            Service.PluginLog.Debug($"{name} ({field.FieldType}): {value}");
+        }
+        // TODO: Convert to JSON and do the actual upload. On hold till the PR obviously
     }
 }
 
