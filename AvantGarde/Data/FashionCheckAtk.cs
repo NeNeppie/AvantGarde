@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AvantGarde.Data;
@@ -40,8 +41,7 @@ public class FashionCheckAtk
         {
             if (slot.IsActive && slot.StampType == 0)
             {
-                // TODO: Substruct HQ from the ID!!!
-                stamps.Add(new GoldStamp(DataManager.GetCategoryID(slot.Hint), slot.ItemId));
+                stamps.Add(new GoldStamp(DataManager.GetCategoryID(slot.Hint), ItemUtil.GetBaseId(slot.ItemId).ItemId));
             }
         }
         return stamps;
@@ -57,7 +57,7 @@ public class FashionCheckAtk
         foreach (var slot in Slots)
         {
             categories.Add(new(DataManager.GetCategoryID(slot.Hint), slot.StampType));
-            itemIds.Add(slot.ItemId);
+            itemIds.Add(ItemUtil.GetBaseId(slot.ItemId).ItemId);
             stainIds.AddRange(slot.StainIdPrimary, slot.StainIdSecondary);
         }
 
