@@ -58,7 +58,7 @@ namespace AvantGarde
             Service.AddonLifecycle.UnregisterListener(AddonEvent.PostSetup, "FashionCheck");
         }
 
-        private void ExportFashionAttempt(FashionCheckAtk atk, uint score)
+        private static void ExportFashionAttempt(FashionCheckAtk atk, uint score)
         {
             var exportObj = atk.Export();
             exportObj.WeekNum = DataManager.GetWeekNumFromTheme(atk.WeeklyTheme);

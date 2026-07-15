@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
@@ -177,10 +178,22 @@ public class UploadManager
         foreach (var field in fields)
         {
             var name = field.Name;
-            var value = field.FieldType.IsArray ? $"{{{string.Join(", ", (uint[])field.GetValue(entry))}}}" : field.GetValue(entry);
+            if (field.GetValue(entry) is {} fieldVal)
+            {
+                var value = field.FieldType.IsArray ? $"{{{string.Join(", ", (uint[])fieldVal)}}}" : field.GetValue(entry);
             Service.PluginLog.Debug($"{name} ({field.FieldType}): {value}");
+            }
         }
+
         // TODO: Convert to JSON and do the actual upload. On hold till the PR obviously
+        try
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(entry), Encoding.UTF8, "application/json");
+            Service.PluginLog.Debug(content.ReadAsStringAsync().Result);
+        }
+        catch (Exception ex)
+        {
+            Service.PluginLog.Warning(ex, "");
+        }
     }
 }
-
