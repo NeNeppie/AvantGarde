@@ -17,6 +17,7 @@ public class SlotWindow
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
 
     private List<Item> _itemsFiltered;
+    private Dictionary<uint, uint> _itemCounts = [];
     private ItemSlot _slot;
     private Vector2 _position = new();
     private bool _isOpen = false;
@@ -26,7 +27,7 @@ public class SlotWindow
         _itemsFiltered = Service.DataManager.Items;
     }
 
-    public void Update(ItemSlot slot, List<int>? itemIDs, Vector2 windowPos, float buttonSize)
+    public void Update(ItemSlot slot, List<(uint Id, uint Count)>? items, Vector2 windowPos, float buttonSize)
     {
         if (slot == _slot && _isOpen)
             _isOpen = false;
@@ -40,15 +41,17 @@ public class SlotWindow
             _position = windowPos;
             _position.X += slot >= ItemSlot.Ears ? buttonSize : -GuiUtilities.SlotWindowSize.X;
 
-            if (itemIDs is not null)
+            if (items is not null)
             {
+                var itemIds = items.Select(item => item.Id).ToList();
+                _itemCounts = items.ToDictionary();
                 _itemsFiltered = Service.DataManager.Items
-                    .Where(item => slot.IsMatchingSlot(item) && itemIDs.Contains((int)item.RowId) == true).ToList();
+                    .Where(item => slot.IsMatchingSlot(item) && itemIds.Contains(item.RowId) == true).ToList();
             }
         }
     }
 
-    public unsafe void Draw()
+    public void Draw()
     {
         if (!_isOpen) { return; }
 
@@ -68,21 +71,34 @@ public class SlotWindow
         {
             using (ImRaii.PushColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1f)))
             {
-                ImGui.TextWrapped("This category could be new, and/or is currently empty in the database.");
+                ImGui.TextWrapped("""
+                This category is currently empty in the database.
+                New data becomes available on a daily basis. Please check back later!
+                """);
                 ImGui.Spacing();
-                ImGui.TextWrapped("If you wish to help, see the github page for more information.");
+                if (Service.PluginConfig.DataCollectionOptedIn)
+                {
+                    ImGui.TextWrapped("Alternatively, in the meantime, go and discover new options! Each submission helps expand the database.");
+                }
+                else
+                {
+                    ImGui.TextWrapped("""
+                    Alternatively, in the meantime, you may help crowdsourcing by opting-in to data collection.
+                    No personal or sensitive information is ever collected.
+                    """);
+                }
             }
 
             ImGui.End();
             return;
         }
 
-        ImGuiClip.ClippedDraw(_itemsFiltered, item => DrawItem(item, showIDs: false, canInteract: true), GuiUtilities.IconSize.Y + ImGui.GetStyle().ItemSpacing.Y);
+        ImGuiClip.ClippedDraw(_itemsFiltered, item => DrawItem(item, showIDs: false, canInteract: true, count: _itemCounts[item.RowId]), GuiUtilities.IconSize.Y + ImGui.GetStyle().ItemSpacing.Y);
 
         ImGui.End();
     }
 
-    public static void DrawItem(Item item, bool showIDs, bool canInteract)
+    public static void DrawItem(Item item, bool showIDs, bool canInteract, uint count = 0)
     {
         if (canInteract)
         {
@@ -110,6 +126,6 @@ public class SlotWindow
         }
         ImGui.TextWrapped(itemName);
 
-        ItemPopupWindow.Draw(item);
+        ItemPopupWindow.Draw(item, count);
     }
 }

@@ -31,7 +31,7 @@ public static class ItemPopupWindow
     private const ushort SourceTypeIconExchange     = 061843;
     private const ushort SourceTypeIconIsland       = 061847;
 
-    public static unsafe void Draw(Item item)
+    public static unsafe void Draw(Item item, uint timesUsed)
     {
         using var popup = ImRaii.Popup($"##avantgarde-item-popup-{item.RowId}");
         if (!popup) return;
@@ -40,6 +40,9 @@ public static class ItemPopupWindow
         ImGui.Separator();
 
         ImGui.Text($"Equippable by: {item.ClassJobCategory.Value.Name}");
+        ImGui.Spacing();
+
+        ImGui.Text($"Times used: {timesUsed}");
         ImGui.Spacing();
 
         DrawGameIcon(SourceTypeIconQuestionMark, GuiUtilities.IconSize);

@@ -109,19 +109,78 @@ public class DataManager
     public static uint GetWeekNumFromTheme(string weeklyTheme) => GetWeeklyThemeID(weeklyTheme) - 9;
 }
 
-public class Export
+public class DataManagerNew
 {
-    public uint WeekNum;
-    public uint Score;
-    public List<Category> Categories = [];
-    public List<uint> ItemIds = [];
-    public List<uint> StainIds = [];
-}
+    public readonly List<Item> Items;
+    public Dictionary<uint, List<(uint Id, uint Count)>> CategoryData = [];
 
-public record Category(uint HintId, uint StampId)
-{
-    public uint[] Coupled() => [HintId, StampId];
-};
+    private static readonly HttpClient _client = new();
+    private const string DataUrl = "https://xivstats.com/data/";
+
+    public DataManagerNew()
+    {
+        // Get all equipable items relevant for Fashion Report
+        Items = Service.DalamudDataManager.GetExcelSheet<Item>()!
+            .Where(item => item.EquipSlotCategory.RowId != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0
+                                                             && item.EquipSlotCategory.Value!.MainHand == 0
+                                                             && item.EquipSlotCategory.Value!.OffHand == 0).ToList();
+        Service.PluginLog.Debug($"Number of items loaded: {Items.Count}");
+
+        _client.DefaultRequestHeaders.Add("Accept", "applcation/json");
+
+        PopulateData(); 
+    }
+
+    public async Task PopulateData()
+    {
+        CategoryData.Clear();
+
+        var res = await _client.GetAsync($"{DataUrl}FashionReport.json");
+        if (res.IsSuccessStatusCode)
+        {
+            try
+            {
+                var json = await res.Content.ReadAsStringAsync();
+                var importData = JsonConvert.DeserializeObject<ImportData>(json) ?? throw new JsonException();
+
+                foreach (var category in importData.Categories)
+                {
+                    CategoryData.Add(category.Key, category.Value.Select((pair) => (pair.Key, pair.Value)).ToList());
+                }
+                // TODO: Parse dye data
+
+                Service.PluginLog.Debug($"Data fetched with status code {(int)res.StatusCode}");
+            }
+            catch(Exception ex)
+            {
+                Service.PluginLog.Error(ex, "Failed to fetch data.");
+            }
+        }
+        else
+        {
+            Service.PluginLog.Error($"Failed to fetch data. {res.ReasonPhrase}");
+        }
+    }
+
+    public class ImportData
+    {
+        public Dictionary<uint, Dictionary<uint, uint>> Categories = [];
+        public Dictionary<uint, List<DyeSlotInfo>> WeeklyDyes = [];
+
+        public class DyeSlotInfo
+        {
+            public uint Id;
+            public string Name = string.Empty;
+            public Dictionary<uint, DyeInfo> Dyes = [];
+        }
+
+        public class DyeInfo
+        {
+            public ulong Count;
+            public float Pct;
+        }
+    }
+}
 
 public static class UploadManager
 {
@@ -189,3 +248,17 @@ public static class UploadManager
         }
     }
 }
+
+public class Export
+{
+    public uint WeekNum;
+    public uint Score;
+    public List<Category> Categories = [];
+    public List<uint> ItemIds = [];
+    public List<uint> StainIds = [];
+}
+
+public record Category(uint HintId, uint StampId)
+{
+    public uint[] Coupled() => [HintId, StampId];
+};

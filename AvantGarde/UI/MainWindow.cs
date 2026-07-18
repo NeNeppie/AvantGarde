@@ -67,9 +67,9 @@ public unsafe class MainWindow
                 {
                     if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(buttonSize), "Show Gear"))
                     {
-                        List<int>? itemIDs = [];
-                        Service.DataManager.CategoryData.TryGetValue(DataManager.GetCategoryID(slotCategory), out itemIDs);
-                        SlotWindow.Update(slot, itemIDs, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
+                        List<(uint Id, uint Count)>? items = [];
+                        Service.DataManager.CategoryData.TryGetValue(DataManager.GetCategoryID(slotCategory), out items);
+                        SlotWindow.Update(slot, items, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
                     }
                 }
                 catch (Exception e) when (e is ArgumentNullException || e is NullReferenceException)
