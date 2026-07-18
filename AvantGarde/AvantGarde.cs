@@ -1,4 +1,5 @@
 ﻿using System;
+using Dalamud.Configuration;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Plugin;
@@ -7,73 +8,93 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using AvantGarde.Data;
 using AvantGarde.UI;
 
-namespace AvantGarde
+namespace AvantGarde;
+
+public sealed class Plugin : IDalamudPlugin
 {
-    public sealed class Plugin : IDalamudPlugin
+    private MainWindow _mainWindow;
+    private DataCollectionWindow _infoWindow;
+    private bool _drawUi = false;
+
+    public unsafe Plugin(IDalamudPluginInterface pluginInterface)
     {
-        private MainWindow _mainWindow;
-        private bool _drawUi = false;
+        pluginInterface.Create<Service>();
+        _mainWindow = new();
+        _infoWindow = new();
 
-        public unsafe Plugin(IDalamudPluginInterface pluginInterface)
+        Service.PluginInterface.UiBuilder.Draw += this.DrawUI;
+
+        Service.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "FashionCheck", (type, args) =>
         {
-            pluginInterface.Create<Service>();
-            _mainWindow = new();
-
-            Service.PluginInterface.UiBuilder.Draw += this.DrawUI;
-
-            Service.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "FashionCheck", (type, args) =>
+            var atkValues = new Span<AtkValue>((AtkValue*)((AddonSetupArgs)args).AtkValues, args.Addon.AtkValuesCount);
+            if (atkValues.Length != FashionCheckAtk.AtkValueCount)
             {
-                var atkValues = new Span<AtkValue>((AtkValue*)((AddonSetupArgs)args).AtkValues, args.Addon.AtkValuesCount);
-                if (atkValues.Length != FashionCheckAtk.AtkValueCount)
-                {
-                    Service.PluginLog.Error("Failure to initialize window - AtkValues count mismatch");
-                    return;
-                }
+                Service.PluginLog.Error("Failure to initialize window - AtkValues count mismatch");
+                return;
+            }
 
-                var atkData = new FashionCheckAtk(atkValues);
-                var scoreGaugeAddon = Service.GameGui.GetAddonByName("FashionCheckScoreGauge");
-                if (scoreGaugeAddon != IntPtr.Zero)
-                {
-                    var score = ((AtkUnitBase*)scoreGaugeAddon.Address)->AtkValues[0].UInt;
-                    ExportFashionAttempt(atkData, score);
-                }
+            var atkData = new FashionCheckAtk(atkValues);
 
-                _mainWindow.Addon = (AtkUnitBase*)args.Addon.Address;
-                _mainWindow.AtkData = atkData;
-                _drawUi = true;
-            });
-
-            Service.AddonLifecycle.RegisterListener(AddonEvent.PreClose, "FashionCheck", (type, args) =>
+            var scoreGaugeAddon = Service.GameGui.GetAddonByName("FashionCheckScoreGauge");
+            if (scoreGaugeAddon != IntPtr.Zero && Service.PluginConfig.DataCollectionOptedIn)
             {
-                _mainWindow.Addon = null;
-                _mainWindow.AtkData = null;
-                _drawUi = false;
-            });
-        }
+                var score = ((AtkUnitBase*)scoreGaugeAddon.Address)->AtkValues[0].UInt;
+                ExportFashionAttempt(atkData, score);
+            }
 
-        public void Dispose()
+            _mainWindow.Addon = (AtkUnitBase*)args.Addon.Address;
+            _mainWindow.AtkData = atkData;
+            _drawUi = true;
+        });
+
+        Service.AddonLifecycle.RegisterListener(AddonEvent.PreClose, "FashionCheck", (type, args) =>
         {
-            Service.PluginInterface.UiBuilder.Draw -= this.DrawUI;
-            Service.AddonLifecycle.UnregisterListener(AddonEvent.PreClose, "FashionCheck");
-            Service.AddonLifecycle.UnregisterListener(AddonEvent.PostSetup, "FashionCheck");
-        }
+            _mainWindow.Addon = null;
+            _mainWindow.AtkData = null;
+            _drawUi = false;
+        });
+    }
 
-        private static void ExportFashionAttempt(FashionCheckAtk atk, uint score)
+    public void Dispose()
+    {
+        Service.PluginInterface.UiBuilder.Draw -= this.DrawUI;
+        Service.AddonLifecycle.UnregisterListener(AddonEvent.PreClose, "FashionCheck");
+        Service.AddonLifecycle.UnregisterListener(AddonEvent.PostSetup, "FashionCheck");
+        Service.PluginConfig.Save();
+    }
+
+    private static void ExportFashionAttempt(FashionCheckAtk atk, uint score)
+    {
+        var exportObj = atk.Export();
+        exportObj.WeekNum = DataManager.GetWeekNumFromTheme(atk.WeeklyTheme);
+        exportObj.Score = score;
+
+        UploadManager.UploadRow upload = new(exportObj);
+        UploadManager.Upload(upload);
+    }
+
+    private void DrawUI()
+    {
+        if (_drawUi)
         {
-            var exportObj = atk.Export();
-            exportObj.WeekNum = DataManager.GetWeekNumFromTheme(atk.WeeklyTheme);
-            exportObj.Score = score;
-
-            UploadManager.UploadRow upload = new(exportObj);
-            UploadManager.Upload(upload);
-        }
-
-        private void DrawUI()
-        {
-            if (_drawUi)
+            _mainWindow.Draw();
+            if (!Service.PluginConfig.SeenDataCollectionMessage)
             {
-                _mainWindow.Draw();
+                _infoWindow.Draw();
             }
         }
+    }
+}
+
+[Serializable]
+public class Configuration : IPluginConfiguration
+{
+    public int Version { get; set; } = 0;
+    public bool DataCollectionOptedIn = false;
+    public bool SeenDataCollectionMessage = false;
+
+    public void Save()
+    {
+        Service.PluginInterface.SavePluginConfig(this);
     }
 }

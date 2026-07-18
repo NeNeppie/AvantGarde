@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
@@ -20,6 +21,23 @@ public static class GuiUtilities
         if (tooltip != null && ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(tooltip);
+        }
+
+        return res;
+    }
+
+    public static bool HyperlinkButton(string label, string url, Vector2 size = default, bool small = false)
+    {
+        var res = small ? ImGui.SmallButton(label) : ImGui.Button(label, size);
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(url);
+        }
+
+        if (res)
+        {
+            Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
         }
 
         return res;

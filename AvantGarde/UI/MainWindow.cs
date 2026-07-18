@@ -37,6 +37,8 @@ public unsafe class MainWindow
             return;
         }
 
+        DrawDataCollectionCheckbox(Addon);
+
         foreach (var slot in Enum.GetValues<ItemSlot>())
         {
             var slotCategory = AtkData.Slots[(int)slot + 1].Hint;
@@ -79,6 +81,33 @@ public unsafe class MainWindow
         SlotWindow.Draw();
 
         ImGui.End();
+    }
+
+    private void DrawDataCollectionCheckbox(AtkUnitBase* addon)
+    {
+        const string checkboxStr = "Opt-in to data collection";
+
+        var weeklyThemeNode = Addon->GetNodeById(2);
+        var pos = new Vector2(weeklyThemeNode->X + weeklyThemeNode->Width, weeklyThemeNode->Y + (weeklyThemeNode->Height * 0.5f)) * Addon->Scale;
+        var height = ((ImGui.GetStyle().FramePadding.Y * 2f) + ImGui.GetFontSize()) * 1.75f;
+        var width = ImGui.CalcTextSize(checkboxStr).X + height + ImGui.GetStyle().ItemSpacing.X;
+        var size = new Vector2(width, height);
+
+        using var color = ImRaii.PushColor(ImGuiCol.ChildBg, new Vector4(0.9f, 0.87f, 0.78f, 1f))
+                                .Push(ImGuiCol.Text, new Vector4(0.36f, 0.24f, 0.19f, 1f))
+                                .Push(ImGuiCol.FrameBg, new Vector4(0.67f, 0.59f, 0.41f, 1f))
+                                .Push(ImGuiCol.Border, new Vector4(0.67f, 0.59f, 0.41f, 1f));
+        using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2f)
+                                .Push(ImGuiStyleVar.FrameRounding, 2f)
+                                .Push(ImGuiStyleVar.ChildBorderSize, 2f)
+                                .Push(ImGuiStyleVar.ChildRounding, 5f);
+        
+        ImGui.SetCursorPos(pos);
+        using var crowdsourcingChild = ImRaii.Child("##child-datacollection", size, true);
+        if (crowdsourcingChild)
+        {
+            ImGui.Checkbox(checkboxStr, ref Service.PluginConfig.DataCollectionOptedIn);
+        }
     }
 
     private Vector2 GetButtonPosition(AtkUnitBase* addon, AtkResNode* node, ItemSlot slot)

@@ -17,9 +17,11 @@ internal sealed class Service
     [PluginService] public static IAddonLifecycle AddonLifecycle {get; private set; } = null!;
 
     public static DataManager DataManager { get; set; } = null!;
+    public static Configuration PluginConfig { get; set; } = null!;
 
     public Service()
     {
+        PluginConfig = (Configuration)PluginInterface.GetPluginConfig()! ?? new Configuration();
         DataManager = new DataManager();
     }
 }

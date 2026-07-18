@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -122,14 +123,14 @@ public record Category(uint HintId, uint StampId)
     public uint[] Coupled() => [HintId, StampId];
 };
 
-public class UploadManager
+public static class UploadManager
 {
     private const string UrlBase = "https://infi.ovh/api/";
     private const string AnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.Ur6wgi_rD4dr3uLLvbLoaEvfLCu4QFWdrF-uHRtbl_s";
 
-    private HttpClient _client = new();
+    private static readonly HttpClient _client = new();
 
-    public UploadManager()
+    static UploadManager()
     {
         _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {AnonKey}");
         _client.DefaultRequestHeaders.Add("Prefer", "return=minimal");
@@ -173,27 +174,18 @@ public class UploadManager
 
     public static async void Upload(UploadRow entry)
     {
-        // DEBUG
-        var fields = entry.GetType().GetFields();
-        foreach (var field in fields)
-        {
-            var name = field.Name;
-            if (field.GetValue(entry) is {} fieldVal)
-            {
-                var value = field.FieldType.IsArray ? $"{{{string.Join(", ", (uint[])fieldVal)}}}" : field.GetValue(entry);
-            Service.PluginLog.Debug($"{name} ({field.FieldType}): {value}");
-            }
-        }
-
-        // TODO: Convert to JSON and do the actual upload. On hold till the PR obviously
         try
         {
             var content = new StringContent(JsonConvert.SerializeObject(entry), Encoding.UTF8, "application/json");
             Service.PluginLog.Debug(content.ReadAsStringAsync().Result);
+            var response = await _client.PostAsync($"{UrlBase}FashionReport", content);
+
+            if (response.StatusCode != HttpStatusCode.Created)
+                Service.PluginLog.Debug($"Content: {response.Content.ReadAsStringAsync().Result}");
         }
         catch (Exception ex)
         {
-            Service.PluginLog.Warning(ex, "");
+            Service.PluginLog.Warning(ex, "Failed to upload entry.");
         }
     }
 }
