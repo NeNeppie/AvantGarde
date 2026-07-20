@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Dalamud.Configuration;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Plugin;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel.Sheets;
 
 using AvantGarde.Data;
 using AvantGarde.UI;
@@ -32,15 +35,9 @@ public sealed class Plugin : IDalamudPlugin
                 Service.PluginLog.Error("Failure to initialize window - AtkValues count mismatch");
                 return;
             }
-
             var atkData = new FashionCheckAtk(atkValues);
 
-            var scoreGaugeAddon = Service.GameGui.GetAddonByName("FashionCheckScoreGauge");
-            if (scoreGaugeAddon != IntPtr.Zero && Service.PluginConfig.DataCollectionOptedIn)
-            {
-                var score = ((AtkUnitBase*)scoreGaugeAddon.Address)->AtkValues[0].UInt;
-                ExportFashionAttempt(atkData, score);
-            }
+            TryExportFashionAttempt();
 
             _mainWindow.Addon = (AtkUnitBase*)args.Addon.Address;
             _mainWindow.AtkData = atkData;
@@ -63,11 +60,39 @@ public sealed class Plugin : IDalamudPlugin
         Service.PluginConfig.Save();
     }
 
-    private static void ExportFashionAttempt(FashionCheckAtk atk, uint score)
+    private static unsafe void TryExportFashionAttempt()
     {
-        var exportObj = atk.Export();
-        exportObj.WeekNum = DataManager.GetWeekNumFromTheme(atk.WeeklyTheme);
-        exportObj.Score = score;
+        var agentFashion = AgentFashion.Instance();
+        if (agentFashion->OpenType != AgentFashionOpenType.Result)
+            return;
+
+        var exportObj = new Export();
+        exportObj.WeekNum = agentFashion->FashionCheckData.WeeklyTheme - 9u;
+        exportObj.Score = agentFashion->FashionCheckData.Score;
+
+        var hints = agentFashion->FashionCheckData.ItemThemes;
+        var stamps = agentFashion->FashionCheckData.ItemEvaluations;
+        var items = agentFashion->Items;
+    
+        if (hints.Length != stamps.Length)
+            return;
+
+        for (int i = 0; i < hints.Length; i++)
+        {
+            exportObj.Categories.Add(new Category(hints[i], stamps[i]));
+        }
+
+        for (int i = 0; i < items.Length; i++)
+        {
+            var itemId = items[i].ItemId;
+            exportObj.ItemIds.Add(itemId);
+            
+            var id = Service.DalamudDataManager.GetExcelSheet<Item>().GetRow(itemId).EquipSlotCategory.RowId;
+            if ((id >= 3 && id <= 8) || id == 1 || id == 2 || id == 13)
+            {
+                exportObj.StainIds.AddRange(items[i].Stain0Id, items[i].Stain1Id);
+            }
+        }
 
         UploadManager.UploadRow upload = new(exportObj);
         UploadManager.Upload(upload);
