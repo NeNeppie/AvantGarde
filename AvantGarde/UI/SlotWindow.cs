@@ -46,7 +46,7 @@ public class SlotWindow
                 var itemIds = items.Select(item => item.Id).ToList();
                 _itemCounts = items.ToDictionary();
                 _itemsFiltered = Service.DataManager.Items
-                    .Where(item => slot.IsMatchingSlot(item) && itemIds.Contains(item.RowId) == true).ToList();
+                    .Where(item => slot.IsMatchingSlot(item) && itemIds.Contains(item.RowId)).ToList();
             }
         }
     }

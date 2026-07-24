@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 
+using AvantGarde.Utils;
+
 namespace AvantGarde.Data;
 
 public class DataManager
@@ -115,7 +117,7 @@ public class DataManagerNew
     public Dictionary<uint, List<(uint Id, uint Count)>> CategoryData = [];
 
     private static readonly HttpClient _client = new();
-    private const string DataUrl = "https://xivstats.com/data/";
+    private const string DataUrl = "https://raw.githubusercontent.com/Infiziert90/FFXIVGachaSpreadsheet/refs/heads/master/website/static/data/";
 
     public DataManagerNew()
     {
@@ -147,6 +149,7 @@ public class DataManagerNew
                 {
                     CategoryData.Add(category.Key, category.Value.Select((pair) => (pair.Key, pair.Value)).ToList());
                 }
+                CategoryData = CategoryData.OrderBy(cat => cat.Key).ToDictionary();
                 // TODO: Parse dye data
 
                 Service.PluginLog.Debug($"Data fetched with status code {(int)res.StatusCode}");
@@ -195,7 +198,6 @@ public static class UploadManager
         _client.DefaultRequestHeaders.Add("Prefer", "return=minimal");
     }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     public class UploadRow
     {
         [JsonProperty("version")]
@@ -229,7 +231,6 @@ public static class UploadManager
             Dyes = export.StainIds.ToArray();
         }
     }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
     public static async void Upload(UploadRow entry)
     {
@@ -238,8 +239,9 @@ public static class UploadManager
             var content = new StringContent(JsonConvert.SerializeObject(entry), Encoding.UTF8, "application/json");
             Service.PluginLog.Debug(content.ReadAsStringAsync().Result);
             var response = await _client.PostAsync($"{UrlBase}FashionReport", content);
-
+            
             if (response.StatusCode != HttpStatusCode.Created)
+                Service.ChatGui.Print(GuiUtilities.BuildUploadErrorMessage());
                 Service.PluginLog.Debug($"Content: {response.Content.ReadAsStringAsync().Result}");
         }
         catch (Exception ex)
