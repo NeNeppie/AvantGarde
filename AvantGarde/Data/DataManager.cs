@@ -117,7 +117,10 @@ public class DataManagerNew
     public Dictionary<uint, List<(uint Id, uint Count)>> CategoryData = [];
 
     private static readonly HttpClient _client = new();
-    private const string DataUrl = "https://raw.githubusercontent.com/Infiziert90/FFXIVGachaSpreadsheet/refs/heads/master/website/static/data/";
+    private static readonly string[] DataUrls = [
+        "https://raw.githubusercontent.com/Infiziert90/FFXIVGachaSpreadsheet/refs/heads/master/website/static/data/FashionReport.json",
+        "https://xivstats.com/data/FashionReport.json"
+    ];
 
     public DataManagerNew()
     {
@@ -130,16 +133,22 @@ public class DataManagerNew
 
         _client.DefaultRequestHeaders.Add("Accept", "applcation/json");
 
-        PopulateData(); 
+        PopulateData();
     }
 
     public async Task PopulateData()
     {
         CategoryData.Clear();
 
-        var res = await _client.GetAsync($"{DataUrl}FashionReport.json");
-        if (res.IsSuccessStatusCode)
-        {
+        foreach (var url in DataUrls)
+        {   
+            var res = await _client.GetAsync(url);
+            if (!res.IsSuccessStatusCode)
+            {
+                Service.PluginLog.Error($"Failed to fetch data from: {url} , {res.ReasonPhrase}");
+                continue;
+            }
+            
             try
             {
                 var json = await res.Content.ReadAsStringAsync();
@@ -152,16 +161,13 @@ public class DataManagerNew
                 CategoryData = CategoryData.OrderBy(cat => cat.Key).ToDictionary();
                 // TODO: Parse dye data
 
-                Service.PluginLog.Debug($"Data fetched with status code {(int)res.StatusCode}");
+                Service.PluginLog.Debug($"Data fetched with status code {(int)res.StatusCode} from: {url}");
+                break;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Service.PluginLog.Error(ex, "Failed to fetch data.");
+                Service.PluginLog.Error(ex, $"Failed to fetch data from: {url}");
             }
-        }
-        else
-        {
-            Service.PluginLog.Error($"Failed to fetch data. {res.ReasonPhrase}");
         }
     }
 
@@ -239,10 +245,10 @@ public static class UploadManager
             var content = new StringContent(JsonConvert.SerializeObject(entry), Encoding.UTF8, "application/json");
             Service.PluginLog.Debug(content.ReadAsStringAsync().Result);
             var response = await _client.PostAsync($"{UrlBase}FashionReport", content);
-            
+
             if (response.StatusCode != HttpStatusCode.Created)
                 Service.ChatGui.Print(GuiUtilities.BuildUploadErrorMessage());
-                Service.PluginLog.Debug($"Content: {response.Content.ReadAsStringAsync().Result}");
+            Service.PluginLog.Debug($"Content: {response.Content.ReadAsStringAsync().Result}");
         }
         catch (Exception ex)
         {
