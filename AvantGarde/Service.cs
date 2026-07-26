@@ -15,6 +15,7 @@ internal sealed class Service
     [PluginService] public static IPluginLog PluginLog { get; private set; } = null!;
     [PluginService] public static IClientState ClientState { get; private set; } = null!;
     [PluginService] public static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
+    [PluginService] public static IChatGui ChatGui { get; private set; } = null!;
 
     public static DataManagerNew DataManager { get; set; } = null!;
     public static Configuration PluginConfig { get; set; } = null!;

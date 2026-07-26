@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 
+using AvantGarde.Utils;
+
 namespace AvantGarde.Data;
 
 public class DataManager
@@ -115,7 +117,10 @@ public class DataManagerNew
     public Dictionary<uint, List<(uint Id, uint Count)>> CategoryData = [];
 
     private static readonly HttpClient _client = new();
-    private const string DataUrl = "https://xivstats.com/data/";
+    private static readonly string[] DataUrls = [
+        "https://raw.githubusercontent.com/Infiziert90/FFXIVGachaSpreadsheet/refs/heads/master/website/static/data/FashionReport.json",
+        "https://xivstats.com/data/FashionReport.json"
+    ];
 
     public DataManagerNew()
     {
@@ -128,16 +133,22 @@ public class DataManagerNew
 
         _client.DefaultRequestHeaders.Add("Accept", "applcation/json");
 
-        PopulateData(); 
+        PopulateData();
     }
 
     public async Task PopulateData()
     {
         CategoryData.Clear();
 
-        var res = await _client.GetAsync($"{DataUrl}FashionReport.json");
-        if (res.IsSuccessStatusCode)
-        {
+        foreach (var url in DataUrls)
+        {   
+            var res = await _client.GetAsync(url);
+            if (!res.IsSuccessStatusCode)
+            {
+                Service.PluginLog.Error($"Failed to fetch data from: {url} , {res.ReasonPhrase}");
+                continue;
+            }
+            
             try
             {
                 var json = await res.Content.ReadAsStringAsync();
@@ -147,18 +158,16 @@ public class DataManagerNew
                 {
                     CategoryData.Add(category.Key, category.Value.Select((pair) => (pair.Key, pair.Value)).ToList());
                 }
+                CategoryData = CategoryData.OrderBy(cat => cat.Key).ToDictionary();
                 // TODO: Parse dye data
 
-                Service.PluginLog.Debug($"Data fetched with status code {(int)res.StatusCode}");
+                Service.PluginLog.Debug($"Data fetched with status code {(int)res.StatusCode} from: {url}");
+                break;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Service.PluginLog.Error(ex, "Failed to fetch data.");
+                Service.PluginLog.Error(ex, $"Failed to fetch data from: {url}");
             }
-        }
-        else
-        {
-            Service.PluginLog.Error($"Failed to fetch data. {res.ReasonPhrase}");
         }
     }
 
@@ -195,7 +204,6 @@ public static class UploadManager
         _client.DefaultRequestHeaders.Add("Prefer", "return=minimal");
     }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     public class UploadRow
     {
         [JsonProperty("version")]
@@ -229,7 +237,6 @@ public static class UploadManager
             Dyes = export.StainIds.ToArray();
         }
     }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
     public static async void Upload(UploadRow entry)
     {
@@ -240,7 +247,8 @@ public static class UploadManager
             var response = await _client.PostAsync($"{UrlBase}FashionReport", content);
 
             if (response.StatusCode != HttpStatusCode.Created)
-                Service.PluginLog.Debug($"Content: {response.Content.ReadAsStringAsync().Result}");
+                Service.ChatGui.Print(GuiUtilities.BuildUploadErrorMessage());
+            Service.PluginLog.Debug($"Content: {response.Content.ReadAsStringAsync().Result}");
         }
         catch (Exception ex)
         {

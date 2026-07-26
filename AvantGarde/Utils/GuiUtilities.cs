@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface;
 
 namespace AvantGarde.Utils;
@@ -41,5 +42,13 @@ public static class GuiUtilities
         }
 
         return res;
+    }
+
+    public static SeString BuildUploadErrorMessage()
+    {
+        return new SeStringBuilder()
+                    .AddUiForeground("[Avant-Garde] ", 707)
+                    .AddUiForeground("Failed to upload. See log for more information", 74)
+                    .Build();
     }
 }
