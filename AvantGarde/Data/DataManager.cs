@@ -247,8 +247,10 @@ public static class UploadManager
             var response = await _client.PostAsync($"{UrlBase}FashionReport", content);
 
             if (response.StatusCode != HttpStatusCode.Created)
+            {
                 Service.ChatGui.Print(GuiUtilities.BuildUploadErrorMessage());
-            Service.PluginLog.Debug($"Content: {response.Content.ReadAsStringAsync().Result}");
+                Service.PluginLog.Debug($"Content: {response.Content.ReadAsStringAsync().Result}");
+            }
         }
         catch (Exception ex)
         {

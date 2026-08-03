@@ -4,6 +4,7 @@ using Dalamud.Configuration;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Plugin;
+using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
@@ -19,7 +20,7 @@ public sealed class Plugin : IDalamudPlugin
     private DataCollectionWindow _infoWindow;
     private bool _drawUi = false;
 
-    public unsafe Plugin(IDalamudPluginInterface pluginInterface)
+    public Plugin(IDalamudPluginInterface pluginInterface)
     {
         pluginInterface.Create<Service>();
         _mainWindow = new();
@@ -27,29 +28,10 @@ public sealed class Plugin : IDalamudPlugin
 
         Service.PluginInterface.UiBuilder.Draw += this.DrawUI;
 
-        Service.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "FashionCheck", (type, args) =>
-        {
-            var atkValues = new Span<AtkValue>((AtkValue*)((AddonSetupArgs)args).AtkValues, args.Addon.AtkValuesCount);
-            if (atkValues.Length != FashionCheckAtk.AtkValueCount)
-            {
-                Service.PluginLog.Error("Failure to initialize window - AtkValues count mismatch");
-                return;
-            }
-            var atkData = new FashionCheckAtk(atkValues);
+        Service.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "FashionCheck", OnFashionCheckPostSetup);
+        Service.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "FashionCheck", TryExportFashionAttempt);
 
-            TryExportFashionAttempt();
-
-            _mainWindow.Addon = (AtkUnitBase*)args.Addon.Address;
-            _mainWindow.AtkData = atkData;
-            _drawUi = true;
-        });
-
-        Service.AddonLifecycle.RegisterListener(AddonEvent.PreClose, "FashionCheck", (type, args) =>
-        {
-            _mainWindow.Addon = null;
-            _mainWindow.AtkData = null;
-            _drawUi = false;
-        });
+        Service.AddonLifecycle.RegisterListener(AddonEvent.PreClose, "FashionCheck", OnFashionCheckDispose);
     }
 
     public void Dispose()
@@ -60,15 +42,29 @@ public sealed class Plugin : IDalamudPlugin
         Service.PluginConfig.Save();
     }
 
-    private static unsafe void TryExportFashionAttempt()
+    private unsafe void OnFashionCheckPostSetup(AddonEvent type, AddonArgs args)
+    {
+        _mainWindow.Addon = (AtkUnitBase*)args.Addon.Address;
+        _drawUi = true;
+    }
+
+    private unsafe void OnFashionCheckDispose(AddonEvent type, AddonArgs args)
+    {
+        _mainWindow.Addon = null;
+        _drawUi = false;
+    }
+
+    private unsafe void TryExportFashionAttempt(AddonEvent type, AddonArgs args)
     {
         var agentFashion = AgentFashion.Instance();
         if (agentFashion->OpenType != AgentFashionOpenType.Result)
             return;
 
-        var exportObj = new Export();
-        exportObj.WeekNum = agentFashion->FashionCheckData.WeeklyTheme - 9u;
-        exportObj.Score = agentFashion->FashionCheckData.Score;
+        var exportObj = new Export
+        {
+            WeekNum = agentFashion->FashionCheckData.WeeklyTheme - 9u,
+            Score = agentFashion->FashionCheckData.Score
+        };
 
         var hints = agentFashion->FashionCheckData.ItemThemes;
         var stamps = agentFashion->FashionCheckData.ItemEvaluations;
@@ -84,7 +80,7 @@ public sealed class Plugin : IDalamudPlugin
 
         for (int i = 0; i < items.Length; i++)
         {
-            var itemId = items[i].ItemId;
+            var itemId = ItemUtil.GetBaseId(items[i].ItemId).ItemId;
             exportObj.ItemIds.Add(itemId);
             
             var id = Service.DalamudDataManager.GetExcelSheet<Item>().GetRow(itemId).EquipSlotCategory.RowId;

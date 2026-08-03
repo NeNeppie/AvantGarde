@@ -15,7 +15,6 @@ namespace AvantGarde.UI;
 public unsafe class MainWindow
 {
     public AtkUnitBase* Addon = null;
-    public FashionCheckAtk? AtkData = null;
 
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
 
@@ -23,7 +22,7 @@ public unsafe class MainWindow
 
     public void Draw()
     {
-        if (Addon is null || AtkData is null) { return; }
+        if (Addon is null) { return; }
 
         var windowPos = new Vector2(Addon->X, Addon->Y);
         var windowSize = new Vector2(Addon->RootNode->Width, Addon->RootNode->Height) * Addon->Scale;
@@ -41,14 +40,15 @@ public unsafe class MainWindow
 
         foreach (var slot in Enum.GetValues<ItemSlot>())
         {
-            var slotCategory = AtkData.Slots[(int)slot + 1].Hint;
             var slotNodeID = 9 + (uint)slot;
+            var atkValueIndex = 13 + ((uint)slot * 11);
+            var slotCategory = Addon->AtkValues[atkValueIndex].String.ToString();
             var slotNode = Addon->GetNodeById(slotNodeID);
 
             var buttonSize = slotNode->Height * Addon->Scale * 0.8f;
             var buttonPos = this.GetButtonPosition(Addon, slotNode, slot);
 
-            if (!AtkData.Slots[(int)slot + 1].IsActive) { continue; }
+            if (slotCategory == "") { continue; }
 
             ImGui.SetCursorPos(buttonPos);
             using var child = ImRaii.Child($"##child-{slot}", new Vector2(buttonSize * 1.15f));
