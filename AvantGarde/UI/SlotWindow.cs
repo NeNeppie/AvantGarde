@@ -7,7 +7,6 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Lumina.Excel.Sheets;
 
-using AvantGarde.Data;
 using AvantGarde.Utils;
 
 namespace AvantGarde.UI;
