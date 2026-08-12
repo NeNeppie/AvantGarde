@@ -1,29 +1,31 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.Sheets;
 
-using AvantGarde.Data;
+using AvantGarde.Managers;
 using AvantGarde.Utils;
 
 namespace AvantGarde.UI;
 
 public unsafe class MainWindow
 {
+    public AtkUnitBase* Addon = null;
+
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
 
     private readonly SlotWindow SlotWindow = new();
 
-    public void Draw(AtkUnitBase* addon)
+    public void Draw()
     {
-        var windowPos = new Vector2(addon->X, addon->Y);
-        var windowSize = new Vector2(addon->RootNode->Width, addon->RootNode->Height) * addon->Scale;
+        if (Addon is null) { return; }
+
+        var windowPos = new Vector2(Addon->X, Addon->Y);
+        var windowSize = new Vector2(Addon->RootNode->Width, Addon->RootNode->Height) * Addon->Scale;
         ImGuiHelpers.ForceNextWindowMainViewport();
         ImGui.SetNextWindowSize(windowSize);
         ImGuiHelpers.SetNextWindowPosRelativeMainViewport(windowPos);
@@ -34,18 +36,18 @@ public unsafe class MainWindow
             return;
         }
 
+        DrawDataCollectionCheckbox(Addon);
+
         foreach (var slot in Enum.GetValues<ItemSlot>())
         {
-            var slotCategory = "";
             var slotNodeID = 9 + (uint)slot;
-            var atkValueIndex = 13 + ((int)slot * 11);
+            var atkValueIndex = 13 + ((uint)slot * 11);
+            var slotCategory = Addon->AtkValues[atkValueIndex].String.ToString();
+            var slotNode = Addon->GetNodeById(slotNodeID);
 
-            var slotNode = addon->GetNodeById(slotNodeID);
+            var buttonSize = slotNode->Height * Addon->Scale * 0.8f;
+            var buttonPos = this.GetButtonPosition(Addon, slotNode, slot);
 
-            var buttonSize = slotNode->Height * addon->Scale * 0.8f;
-            var buttonPos = this.GetButtonPosition(addon, slotNode, slot);
-
-            slotCategory = addon->AtkValues[atkValueIndex].String.ToString();
             if (slotCategory == "") { continue; }
 
             ImGui.SetCursorPos(buttonPos);
@@ -65,9 +67,9 @@ public unsafe class MainWindow
                 {
                     if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(buttonSize), "Show Gear"))
                     {
-                        List<int>? itemIDs = [];
-                        Service.DataManager.CategoryData.TryGetValue(GetCategoryID(slotCategory), out itemIDs);
-                        SlotWindow.Update(slot, itemIDs, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
+                        List<(uint Id, uint Count)>? items = [];
+                        Service.DataManager.CategoryData.TryGetValue(DataManager.GetCategoryID(slotCategory), out items);
+                        SlotWindow.Update(slot, items, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
                     }
                 }
                 catch (Exception e) when (e is ArgumentNullException || e is NullReferenceException)
@@ -81,6 +83,33 @@ public unsafe class MainWindow
         ImGui.End();
     }
 
+    private void DrawDataCollectionCheckbox(AtkUnitBase* addon)
+    {
+        const string checkboxStr = "Opt-in to data collection";
+
+        var weeklyThemeNode = Addon->GetNodeById(2);
+        var pos = new Vector2(weeklyThemeNode->X + weeklyThemeNode->Width, weeklyThemeNode->Y + (weeklyThemeNode->Height * 0.5f)) * Addon->Scale;
+        var height = ((ImGui.GetStyle().FramePadding.Y * 2f) + ImGui.GetFontSize()) * 1.75f;
+        var width = ImGui.CalcTextSize(checkboxStr).X + height + ImGui.GetStyle().ItemSpacing.X;
+        var size = new Vector2(width, height);
+
+        using var color = ImRaii.PushColor(ImGuiCol.ChildBg, new Vector4(0.9f, 0.87f, 0.78f, 1f))
+                                .Push(ImGuiCol.Text, new Vector4(0.36f, 0.24f, 0.19f, 1f))
+                                .Push(ImGuiCol.FrameBg, new Vector4(0.67f, 0.59f, 0.41f, 1f))
+                                .Push(ImGuiCol.Border, new Vector4(0.67f, 0.59f, 0.41f, 1f));
+        using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2f)
+                                .Push(ImGuiStyleVar.FrameRounding, 2f)
+                                .Push(ImGuiStyleVar.ChildBorderSize, 2f)
+                                .Push(ImGuiStyleVar.ChildRounding, 5f);
+        
+        ImGui.SetCursorPos(pos);
+        using var crowdsourcingChild = ImRaii.Child("##child-datacollection", size, true);
+        if (crowdsourcingChild)
+        {
+            ImGui.Checkbox(checkboxStr, ref Service.PluginConfig.DataCollectionOptedIn);
+        }
+    }
+
     private Vector2 GetButtonPosition(AtkUnitBase* addon, AtkResNode* node, ItemSlot slot)
     {
         // Child nodes are all relative to their parent/addon, hence the seemingly random numbers ((246, 30) + (10, 48))
@@ -92,13 +121,5 @@ public unsafe class MainWindow
             position.X += 198f * addon->Scale;
 
         return position;
-    }
-
-    private static uint GetCategoryID(string category)
-    {
-        var themeCategory = Service.DalamudDataManager.GetExcelSheet<FashionCheckThemeCategory>(Service.ClientState.ClientLanguage);
-        var matchingCategory = themeCategory?.FirstOrDefault(cat => cat.Name.ExtractText() == category)
-            ?? throw new NullReferenceException();
-        return matchingCategory.RowId;
     }
 }
