@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 
+using AvantGarde.Utils;
+
 namespace AvantGarde.Managers;
 
 public class DataManager
 {
     public readonly List<Item> Items;
     public Dictionary<uint, List<(uint Id, uint Count)>> CategoryData = [];
+    public Dictionary<uint, List<(uint Id, ulong Count, float Pct)>> DyeData = [];
 
     private static readonly HttpClient Client = new();
     private static readonly string[] DataUrls = [
@@ -58,7 +61,26 @@ public class DataManager
                     CategoryData.Add(category.Key, category.Value.Select((pair) => (pair.Key, pair.Value)).ToList());
                 }
                 CategoryData = CategoryData.OrderBy(cat => cat.Key).ToDictionary();
-                // TODO: Parse dye data
+
+                var weekNum = GetFashionReportWeek();
+                if (importData.WeeklyDyes.TryGetValue(weekNum, out var weeklyDyeData))
+                {
+                    foreach (var slotData in weeklyDyeData) 
+                    {
+                        if (NormalizeSlotID(slotData.Id) is not uint slotId)
+                            continue;
+
+                        DyeData[slotId] = [];
+                        var slot = DyeData[slotId!];
+
+                        foreach(var dye in slotData.Dyes)
+                        {
+                            slot.Add((dye.Key, dye.Value.Count, dye.Value.Pct));
+                        }
+                        // Should already be sorted, but just in case
+                        slot = slot.OrderByDescending(x => x.Pct).ToList();
+                    }
+                }
 
                 Service.PluginLog.Debug($"Data fetched with status code {(int)res.StatusCode} from: {url}");
                 break;
@@ -100,6 +122,32 @@ public class DataManager
     }
 
     public static uint GetWeekNumFromTheme(string weeklyTheme) => GetWeeklyThemeID(weeklyTheme) - 9;
+
+    private static uint? NormalizeSlotID(uint slotId)
+    {
+        return slotId switch
+        {
+            // TODO:
+            // 1 => (uint)ItemSlot.Weapon,
+            34 => (uint)ItemSlot.Head,
+            35 => (uint)ItemSlot.Body,
+            37 => (uint)ItemSlot.Hands,
+            36 => (uint)ItemSlot.Legs,
+            38 => (uint)ItemSlot.Feet,
+            _ => null
+        };
+    }
+
+    private static uint GetFashionReportWeek()
+    {
+        var weekOne = new DateTime(2018, 1, 30);
+        weekOne = DateTime.SpecifyKind(weekOne, DateTimeKind.Utc).AddHours(8);
+
+        var today = DateTime.UtcNow;
+        var diff = today - weekOne;
+        var weeks = (diff.TotalDays / 7) + 1;
+        return (uint)weeks;
+    }
 
     public class ImportData
     {

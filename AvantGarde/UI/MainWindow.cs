@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
@@ -19,6 +18,7 @@ public unsafe class MainWindow
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
 
     private readonly SlotWindow SlotWindow = new();
+    private readonly DyeSlotWindow DyeSlotWindow = new();
 
     public void Draw()
     {
@@ -38,20 +38,38 @@ public unsafe class MainWindow
 
         DrawDataCollectionCheckbox(Addon);
 
+        // TODO: / FIXME: Add weapon slot
         foreach (var slot in Enum.GetValues<ItemSlot>())
         {
-            var slotNodeID = 9 + (uint)slot;
+            var slotNodeId = 9 + (uint)slot;
             var atkValueIndex = 13 + ((uint)slot * 11);
             var slotCategory = Addon->AtkValues[atkValueIndex].String.ToString();
-            var slotNode = Addon->GetNodeById(slotNodeID);
+            var slotNode = Addon->GetNodeById(slotNodeId);
 
-            var buttonSize = slotNode->Height * Addon->Scale * 0.8f;
-            var buttonPos = this.GetButtonPosition(Addon, slotNode, slot);
+            var itemButtonSize = slotNode->Height * Addon->Scale * 0.8f;
+            // +4 to align with the corresponding frame texture
+            var dyeButtonSize = (slotNode->Height + 4f) * Addon->Scale;
+            var itemButtonPos = GetItemButtonPos(Addon, slotNode, slot);
+            var dyeButtonPos = GetDyeButtonPos(Addon, slotNode);
+            
+            if (slot < ItemSlot.Ears)
+            {
+                ImGui.SetCursorPos(GetDyeButtonPos(Addon, slotNode));
+                using var dyeButtonChild = ImRaii.Child($"##child-dye-{slot}", new Vector2(dyeButtonSize * 1.15f));
+                if (dyeButtonChild)
+                {
+                    if (GuiUtilities.IconButton(FontAwesomeIcon.Palette, new Vector2(0f, dyeButtonSize), "Show Dyes"))
+                    {
+                        Service.DataManager.DyeData.TryGetValue((uint)slot, out var dyes);
+                        DyeSlotWindow.Update(slot, dyes, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, dyeButtonSize);
+                    }
+                }
+            }
 
             if (slotCategory == "") { continue; }
 
-            ImGui.SetCursorPos(buttonPos);
-            using var child = ImRaii.Child($"##child-{slot}", new Vector2(buttonSize * 1.15f));
+            ImGui.SetCursorPos(itemButtonPos);
+            using var child = ImRaii.Child($"##child-{slot}", new Vector2(itemButtonSize * 1.15f));
             if (child)
             {
                 using var color = ImRaii.PushColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f))
@@ -60,16 +78,15 @@ public unsafe class MainWindow
                                         .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f));
 
                 using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2f)
-                                        .Push(ImGuiStyleVar.FrameRounding, buttonSize * 0.5f);
+                                        .Push(ImGuiStyleVar.FrameRounding, itemButtonSize * 0.5f);
 
                 ImGui.SetCursorPos(ImGui.GetStyle().FramePadding);
                 try
                 {
-                    if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(buttonSize), "Show Gear"))
+                    if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(itemButtonSize), "Show Gear"))
                     {
-                        List<(uint Id, uint Count)>? items = [];
-                        Service.DataManager.CategoryData.TryGetValue(DataManager.GetCategoryID(slotCategory), out items);
-                        SlotWindow.Update(slot, items, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, buttonSize);
+                        Service.DataManager.CategoryData.TryGetValue(DataManager.GetCategoryID(slotCategory), out var items);
+                        SlotWindow.Update(slot, items, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, itemButtonSize);
                     }
                 }
                 catch (Exception e) when (e is ArgumentNullException || e is NullReferenceException)
@@ -78,6 +95,7 @@ public unsafe class MainWindow
                 }
             }
         }
+        DyeSlotWindow.Draw();
         SlotWindow.Draw();
 
         ImGui.End();
@@ -110,7 +128,7 @@ public unsafe class MainWindow
         }
     }
 
-    private Vector2 GetButtonPosition(AtkUnitBase* addon, AtkResNode* node, ItemSlot slot)
+    private Vector2 GetItemButtonPos(AtkUnitBase* addon, AtkResNode* node, ItemSlot slot)
     {
         // Child nodes are all relative to their parent/addon, hence the seemingly random numbers ((246, 30) + (10, 48))
         var position = (new Vector2(256f + node->X, 78f + node->Y)
@@ -120,6 +138,14 @@ public unsafe class MainWindow
             // Width of the underlying NineGrid node
             position.X += 198f * addon->Scale;
 
+        return position;
+    }
+
+    private Vector2 GetDyeButtonPos(AtkUnitBase* addon, AtkResNode* node)
+    {
+        // Child nodes are all relative to their parent/addon, hence the seemingly random numbers ((246, 30) + (10, 48))
+        var position = (new Vector2(256f + node->X, 78f + node->Y)
+                        + new Vector2(node->Width - 60f, 0f)) * addon->Scale;
         return position;
     }
 }
