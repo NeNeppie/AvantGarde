@@ -1,7 +1,7 @@
 # Avant-Garde for Dalamud
 
 Avant-Garde is a Dalamud plugin aiming to provide a comprehensive list for all hint categories in the Fashion Report minigame.
-This plugin is a [crowdsourced project](#contributing), tracking gear pieces based on category and the slot they occupy.
+This plugin is a [crowdsourced project](#contributing), tracking valid gear pieces based on category and the slot they occupy.
 
 <p align="center">
     <img src="Images/image1.png" width="400">
@@ -9,7 +9,7 @@ This plugin is a [crowdsourced project](#contributing), tracking gear pieces bas
 
 ### How does Fashion Report work?
 
-Each week, a unique theme is presented along with hints for specific slots. These hints are not unique to the theme, and may appear across many different weeks. The goal is to reach a minimum of 80 out of 100 points. Below is a somewhat-deep dive into how score is calculated:
+Each week, a unique theme is presented along with hints for specific slots. These hints are not unique to the theme, and may appear across many different weeks. The goal is to reach a minimum of 80 out of 100 points. Below is a somewhat-technical dive into how score is calculated:
 
 - You are awarded a "base" of 10 points for every piece of gear you have equipped. Accessories award 8 points instead.
 - If a particular slot has a hint attached to it, the base points earned drop down to 2. Thus, by simply filling all slots (except for the offhand slot) the minimum possible score is 68.
@@ -22,13 +22,26 @@ It's worth noting that dyes are tied to the weekly theme, and thus cannot be pre
 
 ## Contributing
 
-You may contribute to the project by submitting gear pieces that match a certain category. You can fill the [Submission Form](https://forms.gle/hW9eFAvPm1ZkQFvG8), or reply to the forum post in the [Dalamud discord server](https://discord.gg/3NMcUV5) @ `#plugin-help-forum` ([Here](https://discord.com/channels/581875019861328007/1166794253553381456/1166794253553381456)). Please attach a screenshot of the result screen to speed up the validation process.
+You may contribute to the project by submitting gear pieces (or dyes!) that match a certain category. The plugin now automates the submission process whenever you do Fashion Report but requires you to manually opt-in.
 
-A link to the data-tracker spreadsheet can be found [here](https://docs.google.com/spreadsheets/d/1b9NwL-Ba4tS0ROSy1_4HPfi7QSMQWuhXKqFSSY9Ovp4/edit?usp=sharing).
+### Data Collection
+
+Should you choose to opt-in, the plugin will collect the following data every time you play the minigame:
+- Fashion Report week number and theme information
+- Your performance (i.e. your score)
+- Items and dyes used
+
+Data collected is completely anonymized. No personal or private information is ever collected, stored or sent. You may change your mind and opt-out at any time! Your choice doesn't affect the functionality of the rest of the plugin.
+
+### Feedback
+
+If you find any bugs, or have any suggestions, feel free to open an issue here on github, or reply to the forum post in the [Dalamud discord server](https://discord.gg/3NMcUV5) @ `#plugin-help-forum` ([here](https://discord.com/channels/581875019861328007/1166794253553381456/1166794253553381456)).
+
+---
+
+Additionally, a link to the old data spreadsheet can be found [here](https://docs.google.com/spreadsheets/d/1b9NwL-Ba4tS0ROSy1_4HPfi7QSMQWuhXKqFSSY9Ovp4/edit?usp=sharing).
 
 ## Todo / TBD
 
--   Dyes!
+-   [WIP] Display dye statistics
 -   Provide information on gear sources. Drop location? Cost from NPCs? Crafting requirement? (Incl. localization)
--   **[Coming to a Testing branch near you!]** Automatic detection and submission of gear.
--   Switch to Native UI
