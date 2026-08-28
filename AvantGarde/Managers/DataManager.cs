@@ -12,9 +12,20 @@ namespace AvantGarde.Managers;
 
 public class DataManager
 {
-    public readonly List<Item> Items;
     public Dictionary<uint, List<(uint Id, uint Count)>> CategoryData = [];
     public Dictionary<uint, List<(uint Id, ulong Count, float Pct)>> DyeData = [];
+
+    public readonly List<Item> Items;
+    public readonly Dictionary<uint, StainEx> StainExMap;
+
+    private static readonly Dictionary<uint, ushort> DyeIconMap = [];
+    private static readonly List<int> DyeItemIds =
+                Enumerable.Range(5729, 5813 - 5729 + 1)
+        .Concat(Enumerable.Range(13114, 13117 - 13114 + 1))
+        .Concat(Enumerable.Range(13708, 13723 - 13708 + 1))
+        .Concat(Enumerable.Range(30116, 30124 - 30116 + 1))
+        .Concat(Enumerable.Range(48163, 48172 - 48163 + 1))
+        .Concat(Enumerable.Range(48227, 1)).ToList();
 
     private static readonly HttpClient Client = new();
     private static readonly string[] DataUrls = [
@@ -24,12 +35,21 @@ public class DataManager
 
     public DataManager()
     {
+        var itemSheet = Service.DalamudDataManager.GetExcelSheet<Item>()!;
+        var stainSheet = Service.DalamudDataManager.GetExcelSheet<Stain>()!;
+
         // Get all equipable items relevant for Fashion Report. Weapons excluded as those never get hints
-        Items = Service.DalamudDataManager.GetExcelSheet<Item>()!
-            .Where(item => item.EquipSlotCategory.RowId != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0
+        Items = itemSheet!.Where(item => item.EquipSlotCategory.RowId != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0 
                                                              && item.EquipSlotCategory.Value!.MainHand == 0
                                                              && item.EquipSlotCategory.Value!.OffHand == 0).ToList();
         Service.PluginLog.Debug($"Number of items loaded: {Items.Count}");
+
+        foreach (var id in DyeItemIds)
+        {
+            var item = itemSheet.GetRowAt(id);
+            DyeIconMap.Add(item.AdditionalData.RowId, item.Icon);
+        }
+        StainExMap = stainSheet.Select(stain => (stain.RowId, new StainEx(stain))).ToDictionary();
 
         Client.DefaultRequestHeaders.Add("Accept", "applcation/json");
 
@@ -166,4 +186,38 @@ public class DataManager
             public float Pct;
         }
     }
+
+    public record StainEx
+    {
+        public Stain Stain;
+        public ulong Count = 0;
+        public float Confidence = 0;
+        public ushort Icon;
+        public string ScoringShade;
+
+        public StainEx(Stain stain)
+        {
+            Stain = stain;
+            Icon = DyeIconMap.GetValueOrDefault<uint, ushort>(stain.RowId, 27614); // Terebinth icon
+            ScoringShade = MapIconToShade(Icon);
+        }
+
+        private static string MapIconToShade(ushort icon)
+        {
+            return icon switch
+            {
+                22811 or 22820 or 22817 => "White", // Metallic Silver is an exception and considered "White"
+                22808 => "Grey",
+                22807 or 22816 => "Black",
+                22805 or 22814 => "Red",
+                22809 or 22818 => "Brown",
+                22806 or 22815 => "Yellow",
+                22810 or 22819 => "Green",
+                22804 or 22813 => "Blue",
+                22812 or 22821 => "Purple",
+                _ => "Unknown"
+            };
+        }
+    }
 }
+
