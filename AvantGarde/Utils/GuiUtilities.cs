@@ -12,6 +12,12 @@ public static class GuiUtilities
     public static Vector2 SlotWindowSize => new(ImGui.CalcTextSize("A").X * 30f, (IconSize.Y + ImGui.GetStyle().ItemSpacing.Y) * 6f);
     public static float ClipperLineHeight => IconSize.Y + ImGui.GetStyle().ItemSpacing.Y;
 
+    public static void CenterNextElement(Vector2 windowSize, Vector2 elementSize) =>
+        ImGui.SetCursorPos((windowSize - elementSize) * 0.5f);
+
+    public static void CenterNextElement(float windowSize, float elementSize) =>
+        ImGui.SetCursorPos(new Vector2(windowSize - elementSize) * 0.5f);
+
     public static bool IconButton(FontAwesomeIcon icon, Vector2 size = default, string? tooltip = null, bool small = false)
     {
         var label = icon.ToIconString();

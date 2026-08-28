@@ -24,7 +24,7 @@ public class DataManager
 
     public DataManager()
     {
-        // Get all equipable items relevant for Fashion Report
+        // Get all equipable items relevant for Fashion Report. Weapons excluded as those never get hints
         Items = Service.DalamudDataManager.GetExcelSheet<Item>()!
             .Where(item => item.EquipSlotCategory.RowId != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0
                                                              && item.EquipSlotCategory.Value!.MainHand == 0
@@ -127,8 +127,7 @@ public class DataManager
     {
         return slotId switch
         {
-            // TODO:
-            // 1 => (uint)ItemSlot.Weapon,
+            1 => (uint)ItemSlot.Weapon,
             34 => (uint)ItemSlot.Head,
             35 => (uint)ItemSlot.Body,
             37 => (uint)ItemSlot.Hands,

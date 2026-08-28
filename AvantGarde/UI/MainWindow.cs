@@ -45,19 +45,23 @@ public unsafe class MainWindow
             var slotCategory = Addon->AtkValues[atkValueIndex].String.ToString();
             var slotNode = Addon->GetNodeById(slotNodeId);
 
-            var itemButtonSize = slotNode->Height * Addon->Scale * 0.8f;
-            // +4 to align with the corresponding frame texture
-            var dyeButtonSize = (slotNode->Height + 4f) * Addon->Scale;
-            var itemButtonPos = GetItemButtonPos(Addon, slotNode, slot);
-            var dyeButtonPos = GetDyeButtonPos(Addon, slotNode);
+            var itemButtonSize = slotNode->Height * 0.8f * Addon->Scale;
+            var dyeButtonSize = slotNode->Height * 0.5f * Addon->Scale;
+            var itemButtonPos = GetItemButtonPos(slotNode, Addon->Scale);
+            var dyeButtonPos = GetDyeButtonPos(slotNode, Addon->Scale);
             
             if (slot < ItemSlot.Ears)
             {
-                ImGui.SetCursorPos(GetDyeButtonPos(Addon, slotNode));
-                using var dyeButtonChild = ImRaii.Child($"##child-dye-{slot}", new Vector2(dyeButtonSize * 1.15f));
+                ImGui.SetCursorPos(dyeButtonPos);
+                var dyeButtonChildSize = dyeButtonSize * 1.15f;
+                using var dyeButtonChild = ImRaii.Child($"##child-dye-{slot}", new Vector2(dyeButtonChildSize));
                 if (dyeButtonChild)
                 {
-                    if (GuiUtilities.IconButton(FontAwesomeIcon.Palette, new Vector2(0f, dyeButtonSize), "Show Dyes"))
+                    using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
+                                            .Push(ImGuiStyleVar.FrameRounding, dyeButtonSize * 0.5f);
+
+                    GuiUtilities.CenterNextElement(dyeButtonChildSize, dyeButtonSize);
+                    if (GuiUtilities.IconButton(FontAwesomeIcon.Palette, new Vector2(dyeButtonSize), "Show Dyes"))
                     {
                         Service.DataManager.DyeData.TryGetValue((uint)slot, out var dyes);
                         DyeSlotWindow.Update(slot, dyes, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, dyeButtonSize);
@@ -76,8 +80,8 @@ public unsafe class MainWindow
                                         .Push(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f))
                                         .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f));
 
-                using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2f)
-                                        .Push(ImGuiStyleVar.FrameRounding, itemButtonSize * 0.5f);
+                using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
+                                        .Push(ImGuiStyleVar.FrameRounding, itemButtonSize * 0.2f);
 
                 ImGui.SetCursorPos(ImGui.GetStyle().FramePadding);
                 try
@@ -127,24 +131,25 @@ public unsafe class MainWindow
         }
     }
 
-    private Vector2 GetItemButtonPos(AtkUnitBase* addon, AtkResNode* node, ItemSlot slot)
+    private Vector2 GetItemButtonPos(AtkResNode* node, float addonScale)
     {
-        // Child nodes are all relative to their parent/addon, hence the seemingly random numbers ((246, 30) + (10, 48))
-        var position = (new Vector2(256f + node->X, 78f + node->Y)
-                        + new Vector2((node->Height * 0.1f) + 0.5f)) * addon->Scale;
+        var buttonComponent = node->GetComponent()->GetNodeById(4);
+        if (buttonComponent is null)
+            return Vector2.Zero;
 
-        if (slot >= ItemSlot.Ears)
-            // Width of the underlying NineGrid node
-            position.X += 198f * addon->Scale;
-
-        return position;
+        // Child nodes are all relative to their parent/addon, hence the seemingly random numbers ((246, 30) + (10, 48) = (256, 78))
+        // Small numbers are for minor adjustments
+        return new Vector2(256f + node->X + buttonComponent->X, 78f + node->Y + buttonComponent->Y + 2f) * addonScale;
     }
 
-    private Vector2 GetDyeButtonPos(AtkUnitBase* addon, AtkResNode* node)
+    private Vector2 GetDyeButtonPos(AtkResNode* node, float addonScale)
     {
-        // Child nodes are all relative to their parent/addon, hence the seemingly random numbers ((246, 30) + (10, 48))
-        var position = (new Vector2(256f + node->X, 78f + node->Y)
-                        + new Vector2(node->Width - 60f, 0f)) * addon->Scale;
-        return position;
+        var imageNode = node->GetComponent()->GetNodeById(3);
+        if (imageNode is null)
+            return Vector2.Zero;
+
+        // Child nodes are all relative to their parent/addon, hence the seemingly random numbers ((246, 30) + (10, 48) = (256, 78))
+        // Small numbers are for minor adjustments
+        return new Vector2(256f + node->X + imageNode->X - 5f, 78f + node->Y - 3f) * addonScale;
     }
 }

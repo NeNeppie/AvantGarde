@@ -38,7 +38,7 @@ public class SlotWindow
         {
             _slot = slot;
             _position = windowPos;
-            _position.X += slot >= ItemSlot.Ears ? buttonSize : -GuiUtilities.SlotWindowSize.X;
+            _position.X += slot >= ItemSlot.Ears ? -GuiUtilities.SlotWindowSize.X : buttonSize;
 
             if (items is not null)
             {
@@ -151,9 +151,8 @@ public class DyeSlotWindow
         {
             _slot = slot;
             _position = windowPos;
-            _position.X += slot >= ItemSlot.Ears ? buttonSize : -GuiUtilities.SlotWindowSize.X;
+            _position.X -= GuiUtilities.SlotWindowSize.X;
 
-            // TODO: Attach icon image to each dye
             if (dyes is not null)
                 _dyes = dyes.Select(dye => new StainEx((int)dye.Id, dye.Count, dye.Pct)).ToList();
 
@@ -177,7 +176,7 @@ public class DyeSlotWindow
         ImGui.Text($"Avant-Garde: {_slot.GetDescription()}");
         ImGui.Separator();
 
-        // TODO: Add lack-of-data message
+        // TODO: Add lack-of-data message?
         if (_dyes.Any())
         {
             ImGuiClip.ClippedDraw(_dyes, dye => DrawDye(dye), GuiUtilities.ClipperLineHeight);
@@ -188,18 +187,21 @@ public class DyeSlotWindow
 
     private void DrawDye(StainEx dye)
     {
-        if (Service.TextureProvider.GetFromGameIcon(new GameIconLookup { IconId = dye.Icon }).TryGetWrap(out var icon, out _))
-        {
-            if (icon is not null)
-            {
-                ImGui.Image(icon.Handle, GuiUtilities.IconSize);
-                ImGui.SameLine();
-            }
-        }
+        var color = FlipEndian(dye.Stain.Color << 8);
+
+        var colorVec4 = ImGui.ColorConvertU32ToFloat4(color);
+        ImGui.ColorEdit4("", ref colorVec4, ImGuiColorEditFlags.NoPicker | ImGuiColorEditFlags.NoInputs | ImGuiColorEditFlags.NoAlpha);
+        ImGui.SameLine();
 
         var itemName = dye.Stain.Name.ExtractText();
-        itemName = $"[{dye.Stain.RowId}] " + itemName;
         ImGui.TextWrapped($"{itemName} ({dye.ScoringShade})\nConfidence: {dye.Confidence * 100:F1}% ({dye.Count} of {_totalRecords})");
+    }
+
+    private static uint FlipEndian(uint value)
+    {
+        return (BitOperations.RotateRight(value & 0x00FF00FFu, 8)
+            + BitOperations.RotateLeft(value & 0xFF00FF00u, 8))
+            | 0xFF000000u;
     }
 }
 
@@ -249,7 +251,7 @@ internal class StainEx
             22808 => "Grey",
             22807 or 22816 => "Black",
             22805 or 22814 => "Red",
-            22809 or 22818 => "Orange",
+            22809 or 22818 => "Brown",
             22806 or 22815 => "Yellow",
             22810 or 22819 => "Green",
             22804 or 22813 => "Blue",
