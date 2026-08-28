@@ -38,11 +38,10 @@ public unsafe class MainWindow
 
         DrawDataCollectionCheckbox(Addon);
 
-        // TODO: / FIXME: Add weapon slot
         foreach (var slot in Enum.GetValues<ItemSlot>())
         {
-            var slotNodeId = 9 + (uint)slot;
-            var atkValueIndex = 13 + ((uint)slot * 11);
+            var slotNodeId = 8 + (uint)slot;
+            var atkValueIndex = 2 + ((uint)slot * 11);
             var slotCategory = Addon->AtkValues[atkValueIndex].String.ToString();
             var slotNode = Addon->GetNodeById(slotNodeId);
 

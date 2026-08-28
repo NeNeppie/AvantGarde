@@ -4,6 +4,7 @@ namespace AvantGarde.Utils;
 
 public enum ItemSlot
 {
+    Weapon,
     Head,
     Body,
     Hands,
@@ -22,6 +23,7 @@ internal static class ItemSlotEx
     {
         return slot switch
         {
+            ItemSlot.Weapon => item.EquipSlotCategory.Value!.MainHand > 0,
             ItemSlot.Head => item.EquipSlotCategory.Value!.Head > 0,
             ItemSlot.Hands => item.EquipSlotCategory.Value!.Gloves > 0,
             ItemSlot.Body => item.EquipSlotCategory.Value!.Body > 0,
