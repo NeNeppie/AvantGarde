@@ -50,59 +50,10 @@ public unsafe class MainWindow
             var itemButtonPos = GetItemButtonPos(slotNode, Addon->Scale);
             var dyeButtonPos = GetDyeButtonPos(slotNode, Addon->Scale);
             
-            if (slot < ItemSlot.Ears)
-            {
-                ImGui.SetCursorPos(dyeButtonPos);
-                var dyeButtonChildSize = dyeButtonSize * 1.15f;
-                using var dyeButtonChild = ImRaii.Child($"##child-dye-{slot}", new Vector2(dyeButtonChildSize));
-                if (dyeButtonChild)
-                {
-                    using var color = ImRaii.PushColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f))
-                                            .Push(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.3f, 0.3f, 0.7f))
-                                            .Push(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f))
-                                            .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f));
-
-                    using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
-                                            .Push(ImGuiStyleVar.FrameRounding, dyeButtonSize * 0.5f);
-
-                    GuiUtilities.CenterNextElement(dyeButtonChildSize, dyeButtonSize);
-                    if (GuiUtilities.IconButton(FontAwesomeIcon.Palette, new Vector2(dyeButtonSize), "Show Dyes"))
-                    {
-                        Service.DataManager.DyeData.TryGetValue((uint)slot, out var dyes);
-                        DyeSlotWindow.Update(slot, dyes, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, dyeButtonSize);
-                    }
+            DrawDyeSlotButton(slot, dyeButtonSize, dyeButtonPos);
+            DrawItemSlotButton(slot, slotCategory, itemButtonSize, itemButtonPos);
                 }
-            }
-
-            if (slotCategory == "") { continue; }
-
-            ImGui.SetCursorPos(itemButtonPos);
-            using var child = ImRaii.Child($"##child-{slot}", new Vector2(itemButtonSize * 1.15f));
-            if (child)
-            {
-                using var color = ImRaii.PushColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f))
-                                        .Push(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.3f, 0.3f, 0.7f))
-                                        .Push(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f))
-                                        .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f));
-
-                using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
-                                        .Push(ImGuiStyleVar.FrameRounding, itemButtonSize * 0.2f);
-
-                ImGui.SetCursorPos(ImGui.GetStyle().FramePadding);
-                try
-                {
-                    if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(itemButtonSize), "Show Gear"))
-                    {
-                        Service.DataManager.CategoryData.TryGetValue(DataManager.GetCategoryID(slotCategory), out var items);
-                        SlotWindow.Update(slot, items, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, itemButtonSize);
-                    }
-                }
-                catch (Exception e) when (e is ArgumentNullException || e is NullReferenceException)
-                {
-                    Service.PluginLog.Error(e, $"Exception {e.GetType} while updating hint window with category: {slotCategory} for slot: {slot}");
-                }
-            }
-        }
+        
         DyeSlotWindow.Draw();
         SlotWindow.Draw();
 
@@ -138,6 +89,61 @@ public unsafe class MainWindow
         if (crowdsourcingChild)
         {
             ImGui.Checkbox(checkboxStr, ref Service.PluginConfig.DataCollectionOptedIn);
+        }
+    }
+
+    private void DrawDyeSlotButton(ItemSlot slot, float size, Vector2 position)
+    {
+        if (slot >= ItemSlot.Ears)
+            return;
+        
+        using var buttonWindow = GuiUtilities.BeginButtonWindow(size, position, $"##child-dye-{slot}");
+        if (!buttonWindow)
+            return;
+
+        using var color = ImRaii.PushColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f))
+                                .Push(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.3f, 0.3f, 0.7f))
+                                .Push(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f))
+                                .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f));
+
+        using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
+                                .Push(ImGuiStyleVar.FrameRounding, size * 0.5f);
+        
+        if (GuiUtilities.IconButton(FontAwesomeIcon.Palette, new Vector2(size), "Show Dyes"))
+        {
+            Service.DataManager.DyeData.TryGetValue((uint)slot, out var dyes);
+            DyeSlotWindow.Update(slot, dyes, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, size);
+        }
+    }
+
+    private void DrawItemSlotButton(ItemSlot slot, string slotCategory, float size, Vector2 position)
+    {
+        if (slotCategory == "")
+            return;
+
+        using var buttonWindow = GuiUtilities.BeginButtonWindow(size, position, $"##child-item-{slot}");
+        if (!buttonWindow)
+            return;
+
+        using var color = ImRaii.PushColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f))
+                                .Push(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.3f, 0.3f, 0.7f))
+                                .Push(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f))
+                                .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f));
+
+        using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
+                                .Push(ImGuiStyleVar.FrameRounding, size * 0.2f);
+        
+        try
+        {
+            if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(size), "Show Gear"))
+            {
+                Service.DataManager.CategoryData.TryGetValue(DataManager.GetCategoryID(slotCategory), out var items);
+                SlotWindow.Update(slot, items, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, size);
+            }
+        }
+        catch (Exception e) when (e is ArgumentNullException || e is NullReferenceException)
+        {
+            Service.PluginLog.Error(e, $"Exception {e.GetType} while updating hint window with category: {slotCategory} for slot: {slot}");
         }
     }
 

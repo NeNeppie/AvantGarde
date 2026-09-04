@@ -3,6 +3,7 @@ using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface;
+using Dalamud.Interface.Utility.Raii;
 
 namespace AvantGarde.Utils;
 
@@ -49,6 +50,20 @@ public static class GuiUtilities
         }
 
         return res;
+    }
+
+    public static ImRaii.ChildDisposable BeginButtonWindow(float size, Vector2 position, string label)
+    {
+        var childSize = size * 1.15f;
+
+        ImGui.SetCursorPos(position);
+        var child = ImRaii.Child(label, new Vector2(childSize));
+        if (child)
+        {
+            CenterNextElement(childSize, size);
+        }
+
+        return child;
     }
 
     public static SeString BuildUploadErrorMessage()
