@@ -43,5 +43,6 @@ Additionally, a link to the old data spreadsheet can be found [here](https://doc
 
 ## Todo / TBD
 
--   [WIP] Display dye statistics
+-   Periodically refetch data
 -   Provide information on gear sources. Drop location? Cost from NPCs? Crafting requirement? (Incl. localization)
+-   Interaction with other plugins (IPC)
