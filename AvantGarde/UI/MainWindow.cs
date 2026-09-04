@@ -25,7 +25,7 @@ public unsafe class MainWindow
         if (Addon is null) { return; }
 
         var windowPos = new Vector2(Addon->X, Addon->Y);
-        var windowSize = new Vector2(Addon->RootNode->Width, Addon->RootNode->Height) * Addon->Scale;
+        var windowSize = new Vector2(Addon->RootNode->Width, Addon->RootNode->Height) * Addon->Scale * 1.1f;
         ImGuiHelpers.ForceNextWindowMainViewport();
         ImGui.SetNextWindowSize(windowSize);
         ImGuiHelpers.SetNextWindowPosRelativeMainViewport(windowPos);
@@ -57,6 +57,11 @@ public unsafe class MainWindow
                 using var dyeButtonChild = ImRaii.Child($"##child-dye-{slot}", new Vector2(dyeButtonChildSize));
                 if (dyeButtonChild)
                 {
+                    using var color = ImRaii.PushColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f))
+                                            .Push(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.3f, 0.3f, 0.7f))
+                                            .Push(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f))
+                                            .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f));
+
                     using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
                                             .Push(ImGuiStyleVar.FrameRounding, dyeButtonSize * 0.5f);
 
@@ -112,11 +117,16 @@ public unsafe class MainWindow
         var pos = new Vector2(weeklyThemeNode->X + weeklyThemeNode->Width, weeklyThemeNode->Y + (weeklyThemeNode->Height * 0.5f)) * Addon->Scale;
         var height = ((ImGui.GetStyle().FramePadding.Y * 2f) + ImGui.GetFontSize()) * 1.75f;
         var width = ImGui.CalcTextSize(checkboxStr).X + height + ImGui.GetStyle().ItemSpacing.X;
+        
+        width = Math.Max(width, 180 * Addon->Scale);
+
         var size = new Vector2(width, height);
 
         using var color = ImRaii.PushColor(ImGuiCol.ChildBg, new Vector4(0.9f, 0.87f, 0.78f, 1f))
                                 .Push(ImGuiCol.Text, new Vector4(0.36f, 0.24f, 0.19f, 1f))
                                 .Push(ImGuiCol.FrameBg, new Vector4(0.67f, 0.59f, 0.41f, 1f))
+                                .Push(ImGuiCol.FrameBgHovered, new Vector4(0.522f, 0.431f, 0.325f, 1f))
+                                .Push(ImGuiCol.FrameBgActive, new Vector4(0.365f, 0.263f, 0.235f, 1f))
                                 .Push(ImGuiCol.Border, new Vector4(0.67f, 0.59f, 0.41f, 1f));
         using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2f)
                                 .Push(ImGuiStyleVar.FrameRounding, 2f)

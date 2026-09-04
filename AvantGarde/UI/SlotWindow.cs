@@ -177,18 +177,27 @@ public class DyeSlotWindow
         ImGui.Text($"Avant-Garde: {_slot.GetDescription()}");
         ImGui.Separator();
 
-        // TODO: Add lack-of-data message?
-        if (_dyes.Any())
+        if (!_dyes.Any())
         {
-            ImGuiClip.ClippedDraw(_dyes, dye => DrawDye(dye), GuiUtilities.ClipperLineHeight);
+            using (ImRaii.PushColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1f)))
+            {
+                ImGui.TextWrapped("No dye data currently exists for this slot.");
+                ImGui.Spacing();
+                ImGui.TextWrapped("New data becomes available on a daily basis. Please check back later!");
+            }
+            
+            ImGui.End();
+            return;
         }
+
+        ImGuiClip.ClippedDraw(_dyes, dye => DrawDye(dye), GuiUtilities.ClipperLineHeight);
 
         ImGui.End();
     }
 
     private void DrawDye(DataManager.StainEx dye)
     {
-        var color = FlipEndian(dye.Stain.Color << 8);
+        var color = ArgbToAbgr(dye.Stain.Color);
 
         var colorVec4 = ImGui.ColorConvertU32ToFloat4(color);
         ImGui.ColorEdit4("", ref colorVec4, ImGuiColorEditFlags.NoPicker | ImGuiColorEditFlags.NoInputs | ImGuiColorEditFlags.NoAlpha);
@@ -198,8 +207,11 @@ public class DyeSlotWindow
         ImGui.TextWrapped($"{itemName} ({dye.ScoringShade})\nConfidence: {dye.Confidence * 100:F1}% ({dye.Count} of {_totalRecords})");
     }
 
-    private static uint FlipEndian(uint value)
+    private static uint ArgbToAbgr(uint value)
     {
+        value <<= 8;
+
+        // Endian flip
         return (BitOperations.RotateRight(value & 0x00FF00FFu, 8)
             + BitOperations.RotateLeft(value & 0xFF00FF00u, 8))
             | 0xFF000000u;
