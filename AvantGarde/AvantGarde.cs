@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dalamud.Configuration;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
@@ -58,6 +59,10 @@ public sealed class Plugin : IDalamudPlugin
     {
         var agentFashion = AgentFashion.Instance();
         if (agentFashion->OpenType != AgentFashionOpenType.Result)
+            return;
+
+        // Don't want duplicate entries if Tracky is installed and enabled
+        if (Service.PluginInterface.InstalledPlugins.Any(p => p.InternalName == "TrackyTrack" && p.IsLoaded))
             return;
 
         var exportObj = new Export
