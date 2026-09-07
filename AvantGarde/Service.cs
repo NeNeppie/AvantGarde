@@ -2,6 +2,7 @@ using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 
+using AvantGarde.IPC;
 using AvantGarde.Managers;
 
 namespace AvantGarde;
@@ -16,13 +17,18 @@ internal sealed class Service
     [PluginService] public static IClientState ClientState { get; private set; } = null!;
     [PluginService] public static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
     [PluginService] public static IChatGui ChatGui { get; private set; } = null!;
+    [PluginService] public static ICommandManager CommandManager { get; private set; } = null!;
 
     public static DataManager DataManager { get; set; } = null!;
     public static Configuration PluginConfig { get; set; } = null!;
+    public static AllaganToolsIpc AllaganToolsIpc { get; set; } = null!;
+    public static ItemVendorLocationIpc ItemVendorLocIpc { get; set; } = null!;
 
     public Service()
     {
         PluginConfig = (Configuration)PluginInterface.GetPluginConfig()! ?? new Configuration();
         DataManager = new DataManager();
+        AllaganToolsIpc = new AllaganToolsIpc();
+        ItemVendorLocIpc = new ItemVendorLocationIpc();
     }
 }

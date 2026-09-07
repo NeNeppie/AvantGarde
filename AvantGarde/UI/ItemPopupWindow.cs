@@ -36,6 +36,8 @@ public static class ItemPopupWindow
         using var popup = ImRaii.Popup($"##avantgarde-item-popup-{item.RowId}");
         if (!popup) return;
 
+        var drawSeparatorIpc = true;
+
         ImGui.TextUnformatted(item.Name.ExtractText());
         ImGui.Separator();
 
@@ -67,6 +69,22 @@ public static class ItemPopupWindow
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip($"https://garlandtools.org/db/#item/{item.RowId}");
 
+        if (Service.AllaganToolsIpc.IsAvailable)
+        {
+            DrawIPCSeparator(ref drawSeparatorIpc);
+            
+            if (ImGui.Selectable("Open in Allagan Tools"))   
+                Service.AllaganToolsIpc.OpenMoreInformation(item.RowId);
+        }
+
+        if (Service.ItemVendorLocIpc.IsAvailable)
+        {
+            DrawIPCSeparator(ref drawSeparatorIpc);
+
+            if (ImGui.Selectable("Open in Item Vendor Location"))
+                Service.ItemVendorLocIpc.OpenVendorResults(item.RowId);
+        }
+
         // TODO: Possible item {EQUIPABLE GEAR} sources:
         //      * Crafting
         //      * Exchange (Special Shop - non-gil-currencies, raids tokens, tomestones, etc.)
@@ -77,6 +95,15 @@ public static class ItemPopupWindow
         //      * Achievement Claim
         //      * Retainer Ventures (Rare ARR gear exclusive to Ventures)
         //      * Eureka & Bozja Lockboxes
+    }
+
+    private static void DrawIPCSeparator(ref bool shouldDraw)
+    {
+        if (shouldDraw)
+        {
+            ImGui.Separator();
+            shouldDraw = false;
+        }
     }
 
     private static unsafe void LinkItem(Item item)
