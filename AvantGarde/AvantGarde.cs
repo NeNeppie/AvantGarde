@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Dalamud.Configuration;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Plugin;
@@ -109,18 +107,5 @@ public sealed class Plugin : IDalamudPlugin
                 _infoWindow.Draw();
             }
         }
-    }
-}
-
-[Serializable]
-public class Configuration : IPluginConfiguration
-{
-    public int Version { get; set; } = 0;
-    public bool DataCollectionOptedIn = false;
-    public bool SeenDataCollectionMessage = false;
-
-    public void Save()
-    {
-        Service.PluginInterface.SavePluginConfig(this);
     }
 }

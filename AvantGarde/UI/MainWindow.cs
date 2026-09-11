@@ -13,12 +13,21 @@ namespace AvantGarde.UI;
 
 public unsafe class MainWindow
 {
-    public AtkUnitBase* Addon = null;
+    public AtkUnitBase* Addon
+    {
+        get;
+        set
+        {
+            field = value;
+            ConfigurationWindow.Addon = value;
+        }
+    } = null;
 
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
 
     private readonly SlotWindow SlotWindow = new();
     private readonly DyeSlotWindow DyeSlotWindow = new();
+    private readonly ConfigurationWindow ConfigurationWindow = new();
 
     public void Draw()
     {
@@ -56,6 +65,7 @@ public unsafe class MainWindow
         
         DyeSlotWindow.Draw();
         SlotWindow.Draw();
+        ConfigurationWindow.Draw();
 
         ImGui.End();
     }
@@ -90,6 +100,10 @@ public unsafe class MainWindow
         {
             ImGui.Checkbox(checkboxStr, ref Service.PluginConfig.DataCollectionOptedIn);
         }
+
+        ImGui.SameLine();
+        if (GuiUtilities.IconButton(FontAwesomeIcon.Cog, GuiUtilities.IconSize, "Open Settings"))
+            ConfigurationWindow.ToggleVisible();
     }
 
     private void DrawDyeSlotButton(ItemSlot slot, float size, Vector2 position)

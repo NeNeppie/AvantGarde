@@ -1,5 +1,6 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 
 using AvantGarde.Utils;
@@ -18,7 +19,7 @@ public class DataCollectionWindow
     {
         if (!_shouldDraw) return;
 
-        var center = ImGui.GetMainViewport().GetCenter();
+        var center = ImGuiHelpers.MainViewport.GetCenter();
         ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
 
         if (!ImGui.Begin("IMPORTANT !##avantgarde-datacollection", WindowFlags))
