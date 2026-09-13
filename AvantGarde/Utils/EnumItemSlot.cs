@@ -2,7 +2,7 @@ using Lumina.Excel.Sheets;
 
 namespace AvantGarde.Utils;
 
-public enum ItemSlot
+public enum ItemSlot : byte
 {
     Weapon,
     Head,

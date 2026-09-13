@@ -25,7 +25,7 @@ public unsafe class MainWindow
 
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMouseInputs;
 
-    private readonly SlotWindow SlotWindow = new();
+    private readonly ItemSlotWindow SlotWindow = new();
     private readonly DyeSlotWindow DyeSlotWindow = new();
     private readonly ConfigurationWindow ConfigurationWindow = new();
 

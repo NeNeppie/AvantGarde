@@ -1,11 +1,10 @@
-namespace AvantGarde;
+namespace AvantGarde.Utils;
 
 public enum SortingMode : byte
 {
     InternalId = 0,
     PopularityDescending,
-    PopularityAscending,
-    OwnershipAT
+    PopularityAscending
 }
 
 internal static class SortingModeEx

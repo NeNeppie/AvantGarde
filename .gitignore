@@ -4,3 +4,4 @@ obj/
 bin/
 *.user
 *.sln
+debug/

@@ -19,7 +19,7 @@ public static class GuiUtilities
     public static void CenterNextElement(float windowSize, float elementSize) =>
         ImGui.SetCursorPos(new Vector2(windowSize - elementSize) * 0.5f);
 
-    public static bool IconButton(FontAwesomeIcon icon, Vector2 size = default, string? tooltip = null, bool small = false)
+    public static bool IconButton(FontAwesomeIcon icon, Vector2 size = default, string tooltip = "", bool small = false)
     {
         var label = icon.ToIconString();
 
@@ -27,7 +27,7 @@ public static class GuiUtilities
         bool res = small ? ImGui.SmallButton(label) : ImGui.Button(label, size);
         ImGui.PopFont();
 
-        if (tooltip != null && ImGui.IsItemHovered())
+        if (tooltip != "" && ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(tooltip);
         }

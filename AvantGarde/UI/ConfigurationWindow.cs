@@ -5,6 +5,8 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
+using AvantGarde.Utils;
+
 namespace AvantGarde.UI;
 
 public unsafe class ConfigurationWindow
@@ -31,6 +33,8 @@ public unsafe class ConfigurationWindow
             return;
         }
 
+        ImGui.TextColored(new Vector4(0.2f, 0.52f, 0.83f, 1f), "General");
+
         ImGui.Checkbox("Opt-in to data collection", ref Service.PluginConfig.DataCollectionOptedIn);
         ImGuiHelpers.ScaledDummy(5f);
 
@@ -46,12 +50,40 @@ public unsafe class ConfigurationWindow
                     var label = choice.GetDescription();
 
                     if (ImGui.Selectable(label, label == currentValue))
+                    {
                         Service.PluginConfig.SortingMode = (int)choice;
+                        Service.PluginConfig.Save();
+                    }
                 }
             }
         }
         ImGuiHelpers.ScaledDummy(5f);
 
+        ImGui.TextColored(new Vector4(0.2f, 0.52f, 0.83f, 1f), "Allagan Tools");
+        ImGui.TextDisabled("These require Allagan Tools to be enabled");
+
+        var highlightOwned = Service.PluginConfig.HighlightOwned;
+        ImGui.Checkbox("Highlight items you own", ref highlightOwned);
+        if (highlightOwned != Service.PluginConfig.HighlightOwned)
+        {
+            Service.PluginConfig.HighlightOwned = highlightOwned;
+            Service.PluginConfig.Save();
+        }
+
+        var sortByOwned = Service.PluginConfig.SortByOwned;
+        ImGui.Checkbox("Sort additionally by items owned", ref sortByOwned);
+        if (sortByOwned != Service.PluginConfig.SortByOwned)
+        {
+            Service.PluginConfig.SortByOwned = sortByOwned;
+            Service.PluginConfig.Save();
+        }
+
+        ImGuiHelpers.ScaledDummy(25f);
+
+        ImGui.TextColored(new Vector4(0.2f, 0.52f, 0.83f, 1f), "About");
+        ImGui.Text($"Version: {Service.PluginInterface.Manifest.AssemblyVersion}");
+
+        ImGuiHelpers.ScaledDummy(5f);
         ImGui.End();
     }
 

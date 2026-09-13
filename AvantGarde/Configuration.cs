@@ -1,5 +1,4 @@
 using System;
-using System.Text.Json.Serialization;
 using Dalamud.Configuration;
 
 namespace AvantGarde;
@@ -13,15 +12,8 @@ public class Configuration : IPluginConfiguration
 
     public int SortingMode = 0;
 
-    [property: JsonIgnore]
-    public bool HighlightOwned
-    {
-        get
-        {
-            return field ^ false; // TEMP: Placeholder for Allagan Tools IPC
-        }
-        set;
-    } = false;
+    public bool HighlightOwned = false;
+    public bool SortByOwned = false;
 
     public void Save()
     {

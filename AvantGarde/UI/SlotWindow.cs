@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
-using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Lumina.Excel.Sheets;
@@ -12,17 +11,18 @@ using AvantGarde.Utils;
 
 namespace AvantGarde.UI;
 
-public class SlotWindow
+public class ItemSlotWindow
 {
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
 
     private List<Item> _itemsFiltered;
     private Dictionary<uint, uint> _itemCounts = [];
+    private Dictionary<uint, bool> _itemOwnership = [];
     private ItemSlot _slot;
     private Vector2 _position = new();
     private bool _isOpen = false;
 
-    public SlotWindow()
+    public ItemSlotWindow()
     {
         _itemsFiltered = Service.DataManager.Items;
     }
@@ -35,6 +35,7 @@ public class SlotWindow
             _isOpen = true;
 
         _itemsFiltered = [];
+
         if (_isOpen)
         {
             _slot = slot;
@@ -48,6 +49,9 @@ public class SlotWindow
                 _itemsFiltered = Service.DataManager.Items
                     .Where(item => slot.IsMatchingSlot(item) && itemIds.Contains(item.RowId)).ToList();
             }
+
+            // TODO: Not rely on IPC for inventory searching
+            _itemsFiltered.ForEach(item => _itemOwnership[item.RowId] = Service.AllaganToolsIpc.FindOwnedItem(item.RowId));
         }
     }
 
@@ -93,40 +97,47 @@ public class SlotWindow
             return;
         }
 
-        ImGuiClip.ClippedDraw(_itemsFiltered, item => DrawItem(item, showIDs: false, canInteract: true, count: _itemCounts[item.RowId]), GuiUtilities.ClipperLineHeight);
+        ImGuiClip.ClippedDraw(
+            _itemsFiltered,
+            item => DrawItem(
+                item,
+                useCount: _itemCounts[item.RowId],
+                dimmed: Service.PluginConfig.HighlightOwned && !_itemOwnership[item.RowId]),
+            GuiUtilities.ClipperLineHeight);
 
         ImGui.End();
     }
 
-    public static void DrawItem(Item item, bool showIDs, bool canInteract, uint count = 0)
+    // TODO: Elipses if two lines of wrapped text exceed space width
+    //       Use default (user theme dependent) imgui text color instead of #FFFFFF
+    //       Move icon drawing to utility function (see ItemPopupWindow.DrawGameIcon)
+    public static void DrawItem(Item item, uint useCount = 0, bool selectable = true, bool showIds = false, bool dimmed = false)
     {
-        if (canInteract)
+        var icon = Service.TextureProvider.GetFromGameIcon(new(item.Icon));
+        var itemName = item.Name.ExtractText();
+        var selectableSize = new Vector2(GuiUtilities.SlotWindowSize.X, GuiUtilities.IconSize.Y);
+
+        if (showIds)
+            itemName = $"[{item.RowId}] " + itemName;
+
+        if (selectable)
         {
-            if (ImGui.Selectable($"##avantgarde-popup-select-{item.RowId}", false, ImGuiSelectableFlags.None, new Vector2(GuiUtilities.SlotWindowSize.X, GuiUtilities.IconSize.Y))
-                && (ImGui.IsMouseReleased(ImGuiMouseButton.Left) || ImGui.IsMouseReleased(ImGuiMouseButton.Right)))
-            {
+            if (ImGui.Selectable($"##avantgarde-popup-select-{item.RowId}", false, ImGuiSelectableFlags.None, selectableSize))
                 ImGui.OpenPopup($"##avantgarde-item-popup-{item.RowId}");
-            }
+
             ImGui.SetCursorPosY(ImGui.GetCursorPosY() - GuiUtilities.IconSize.Y - ImGui.GetStyle().FramePadding.Y);
         }
 
-        if (Service.TextureProvider.GetFromGameIcon(new GameIconLookup { IconId = item.Icon }).TryGetWrap(out var icon, out _))
+        if (icon.TryGetWrap(out var texture, out _))
         {
-            if (icon is not null)
-            {
-                ImGui.Image(icon.Handle, GuiUtilities.IconSize);
-                ImGui.SameLine();
-            }
+            var tint = dimmed ? Vector4.One with {W = 0.5f} : Vector4.One;
+            ImGui.Image(texture.Handle, GuiUtilities.IconSize, Vector2.Zero, Vector2.One, tint);
+            ImGui.SameLine();
         }
 
-        var itemName = item.Name.ExtractText();
-        if (showIDs)
-        {
-            itemName = $"[{item.RowId}] " + itemName;
-        }
-        ImGui.TextWrapped(itemName);
+        ImGui.TextColoredWrapped(dimmed ? Vector4.One with {W = 0.5f} : Vector4.One, itemName);
 
-        ItemPopupWindow.Draw(item, count);
+        ItemPopupWindow.Draw(item, useCount);
     }
 }
 
@@ -185,7 +196,7 @@ public class DyeSlotWindow
                 ImGui.Spacing();
                 ImGui.TextWrapped("New data becomes available on a daily basis. Please check back later!");
             }
-            
+
             ImGui.End();
             return;
         }
