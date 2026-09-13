@@ -7,7 +7,7 @@ using Dalamud.Interface.Utility.Raii;
 using Lumina.Excel.Sheets;
 
 using AvantGarde.Managers;
-using AvantGarde.Utils;
+using AvantGarde.Utilities;
 
 namespace AvantGarde.UI;
 
@@ -40,7 +40,7 @@ public class ItemSlotWindow
         {
             _slot = slot;
             _position = windowPos;
-            _position.X += slot >= ItemSlot.Ears ? -GuiUtilities.SlotWindowSize.X : buttonSize;
+            _position.X += slot >= ItemSlot.Ears ? -ImGuiUtils.SlotWindowSize.X : buttonSize;
 
             if (items is not null)
             {
@@ -59,7 +59,7 @@ public class ItemSlotWindow
     {
         if (!_isOpen) { return; }
 
-        ImGui.SetNextWindowSize(GuiUtilities.SlotWindowSize);
+        ImGui.SetNextWindowSize(ImGuiUtils.SlotWindowSize);
         ImGui.SetNextWindowPos(_position);
 
         if (!ImGui.Begin($"##avantgarde-item-display-{_slot}", WindowFlags))
@@ -103,7 +103,7 @@ public class ItemSlotWindow
                 item,
                 useCount: _itemCounts[item.RowId],
                 dimmed: Service.PluginConfig.HighlightOwned && !_itemOwnership[item.RowId]),
-            GuiUtilities.ClipperLineHeight);
+            ImGuiUtils.ClipperLineHeight);
 
         ImGui.End();
     }
@@ -115,7 +115,7 @@ public class ItemSlotWindow
     {
         var icon = Service.TextureProvider.GetFromGameIcon(new(item.Icon));
         var itemName = item.Name.ExtractText();
-        var selectableSize = new Vector2(GuiUtilities.SlotWindowSize.X, GuiUtilities.IconSize.Y);
+        var selectableSize = new Vector2(ImGuiUtils.SlotWindowSize.X, ImGuiUtils.IconSize.Y);
 
         if (showIds)
             itemName = $"[{item.RowId}] " + itemName;
@@ -125,13 +125,13 @@ public class ItemSlotWindow
             if (ImGui.Selectable($"##avantgarde-popup-select-{item.RowId}", false, ImGuiSelectableFlags.None, selectableSize))
                 ImGui.OpenPopup($"##avantgarde-item-popup-{item.RowId}");
 
-            ImGui.SetCursorPosY(ImGui.GetCursorPosY() - GuiUtilities.IconSize.Y - ImGui.GetStyle().FramePadding.Y);
+            ImGui.SetCursorPosY(ImGui.GetCursorPosY() - ImGuiUtils.IconSize.Y - ImGui.GetStyle().FramePadding.Y);
         }
 
         if (icon.TryGetWrap(out var texture, out _))
         {
             var tint = dimmed ? Vector4.One with {W = 0.5f} : Vector4.One;
-            ImGui.Image(texture.Handle, GuiUtilities.IconSize, Vector2.Zero, Vector2.One, tint);
+            ImGui.Image(texture.Handle, ImGuiUtils.IconSize, Vector2.Zero, Vector2.One, tint);
             ImGui.SameLine();
         }
 
@@ -163,7 +163,7 @@ public class DyeSlotWindow
         {
             _slot = slot;
             _position = windowPos;
-            _position.X -= GuiUtilities.SlotWindowSize.X;
+            _position.X -= ImGuiUtils.SlotWindowSize.X;
 
             if (dyes is not null)
                 _dyes = dyes.Select(dye => Service.DataManager.StainExMap[dye.Id] with { Count = dye.Count, Confidence = dye.Pct }).ToList();
@@ -176,7 +176,7 @@ public class DyeSlotWindow
     {
         if (!_isOpen) { return; }
 
-        ImGui.SetNextWindowSize(GuiUtilities.SlotWindowSize);
+        ImGui.SetNextWindowSize(ImGuiUtils.SlotWindowSize);
         ImGui.SetNextWindowPos(_position);
 
         if (!ImGui.Begin($"##avantgarde-dye-display-{_slot}", WindowFlags))
@@ -201,7 +201,7 @@ public class DyeSlotWindow
             return;
         }
 
-        ImGuiClip.ClippedDraw(_dyes, dye => DrawDye(dye), GuiUtilities.ClipperLineHeight);
+        ImGuiClip.ClippedDraw(_dyes, dye => DrawDye(dye), ImGuiUtils.ClipperLineHeight);
 
         ImGui.End();
     }

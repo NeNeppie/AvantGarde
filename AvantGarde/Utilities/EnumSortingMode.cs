@@ -1,4 +1,4 @@
-namespace AvantGarde.Utils;
+namespace AvantGarde.Utilities;
 
 public enum SortingMode : byte
 {

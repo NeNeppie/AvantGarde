@@ -3,7 +3,7 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 
-using AvantGarde.Utils;
+using AvantGarde.Utilities;
 
 namespace AvantGarde.UI;
 
@@ -69,12 +69,12 @@ public class DataCollectionWindow
 
         using (var color = ImRaii.PushColor(ImGuiCol.Button, ColorDiscordBlurple))
         {
-            GuiUtilities.HyperlinkButton("Discord Forum Post", "https://discord.com/channels/581875019861328007/1166794253553381456");
+            ImGuiUtils.HyperlinkButton("Discord Forum Post", "https://discord.com/channels/581875019861328007/1166794253553381456");
             ImGui.SameLine();
         }
         using (var color = ImRaii.PushColor(ImGuiCol.Button, ColorGithubOrange))
         {
-            GuiUtilities.HyperlinkButton("Github Issues", "https://github.com/NeNeppie/AvantGarde/issues");
+            ImGuiUtils.HyperlinkButton("Github Issues", "https://github.com/NeNeppie/AvantGarde/issues");
         }
 
         ImGui.End();

@@ -4,9 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using Dalamud.Game.Text.SeStringHandling;
 using Newtonsoft.Json;
-
-using AvantGarde.Utils;
 
 namespace AvantGarde.Managers;
 
@@ -57,7 +56,7 @@ public static class UploadManager
 
             if (response.StatusCode != HttpStatusCode.Created)
             {
-                Service.ChatGui.Print(GuiUtilities.BuildUploadErrorMessage());
+                Service.ChatGui.Print(BuildUploadErrorMessage());
                 Service.PluginLog.Debug($"Content: {response.Content.ReadAsStringAsync().Result}");
             }
         }
@@ -65,6 +64,14 @@ public static class UploadManager
         {
             Service.PluginLog.Warning(ex, "Failed to upload entry.");
         }
+    }
+
+    private static SeString BuildUploadErrorMessage()
+    {
+        return new SeStringBuilder()
+                    .AddUiForeground("[Avant-Garde] ", 707)
+                    .AddUiForeground("Failed to upload. See log for more information", 74)
+                    .Build();
     }
 }
 

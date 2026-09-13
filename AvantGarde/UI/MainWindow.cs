@@ -7,7 +7,7 @@ using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 using AvantGarde.Managers;
-using AvantGarde.Utils;
+using AvantGarde.Utilities;
 
 namespace AvantGarde.UI;
 
@@ -102,7 +102,7 @@ public unsafe class MainWindow
         }
 
         ImGui.SameLine();
-        if (GuiUtilities.IconButton(FontAwesomeIcon.Cog, GuiUtilities.IconSize, "Open Settings"))
+        if (ImGuiUtils.IconButton(FontAwesomeIcon.Cog, ImGuiUtils.IconSize, "Open Settings"))
             ConfigurationWindow.ToggleVisible();
     }
 
@@ -111,7 +111,7 @@ public unsafe class MainWindow
         if (slot >= ItemSlot.Ears)
             return;
         
-        using var buttonWindow = GuiUtilities.BeginButtonWindow(size, position, $"##child-dye-{slot}");
+        using var buttonWindow = ImGuiUtils.BeginButtonWindow(size, position, $"##child-dye-{slot}");
         if (!buttonWindow)
             return;
 
@@ -123,7 +123,7 @@ public unsafe class MainWindow
         using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
                                 .Push(ImGuiStyleVar.FrameRounding, size * 0.5f);
         
-        if (GuiUtilities.IconButton(FontAwesomeIcon.Palette, new Vector2(size), "Show Dyes"))
+        if (ImGuiUtils.IconButton(FontAwesomeIcon.Palette, new Vector2(size), "Show Dyes"))
         {
             Service.DataManager.DyeData.TryGetValue((uint)slot, out var dyes);
             DyeSlotWindow.Update(slot, dyes, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, size);
@@ -135,7 +135,7 @@ public unsafe class MainWindow
         if (slotCategory == "")
             return;
 
-        using var buttonWindow = GuiUtilities.BeginButtonWindow(size, position, $"##child-item-{slot}");
+        using var buttonWindow = ImGuiUtils.BeginButtonWindow(size, position, $"##child-item-{slot}");
         if (!buttonWindow)
             return;
 
@@ -149,7 +149,7 @@ public unsafe class MainWindow
         
         try
         {
-            if (GuiUtilities.IconButton(FontAwesomeIcon.List, new Vector2(size), "Show Gear"))
+            if (ImGuiUtils.IconButton(FontAwesomeIcon.List, new Vector2(size), "Show Gear"))
             {
                 Service.DataManager.CategoryData.TryGetValue(DataManager.GetCategoryID(slotCategory), out var items);
                 SlotWindow.Update(slot, items, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, size);

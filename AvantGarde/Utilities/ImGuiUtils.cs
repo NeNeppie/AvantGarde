@@ -1,13 +1,12 @@
 using System.Diagnostics;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
-using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 
-namespace AvantGarde.Utils;
+namespace AvantGarde.Utilities;
 
-public static class GuiUtilities
+public static class ImGuiUtils
 {
     public static Vector2 IconSize => new(ImGui.GetTextLineHeight() * 2f);
     public static Vector2 SlotWindowSize => new(ImGui.CalcTextSize("A").X * 30f, (IconSize.Y + ImGui.GetStyle().ItemSpacing.Y) * 6f);
@@ -64,13 +63,5 @@ public static class GuiUtilities
         }
 
         return child;
-    }
-
-    public static SeString BuildUploadErrorMessage()
-    {
-        return new SeStringBuilder()
-                    .AddUiForeground("[Avant-Garde] ", 707)
-                    .AddUiForeground("Failed to upload. See log for more information", 74)
-                    .Build();
     }
 }

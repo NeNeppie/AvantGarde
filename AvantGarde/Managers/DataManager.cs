@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 
-using AvantGarde.Utils;
+using AvantGarde.Utilities;
 
 namespace AvantGarde.Managers;
 
@@ -40,8 +40,8 @@ public class DataManager
 
         // Get all equipable items relevant for Fashion Report. Weapons excluded as those never get hints
         Items = itemSheet!.Where(item => item.EquipSlotCategory.RowId != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0 
-                                                             && item.EquipSlotCategory.Value!.MainHand == 0
-                                                             && item.EquipSlotCategory.Value!.OffHand == 0).ToList();
+                                                                           && item.EquipSlotCategory.Value!.MainHand == 0
+                                                                           && item.EquipSlotCategory.Value!.OffHand == 0).ToList();
         Service.PluginLog.Debug($"Number of items loaded: {Items.Count}");
 
         foreach (var id in DyeItemIds)

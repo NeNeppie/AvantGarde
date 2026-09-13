@@ -5,7 +5,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
-using AvantGarde.Utils;
+using AvantGarde.Utilities;
 
 namespace AvantGarde.UI;
 

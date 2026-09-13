@@ -6,7 +6,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using Lumina.Excel.Sheets;
 
-using AvantGarde.Utils;
+using AvantGarde.Utilities;
 
 namespace AvantGarde.UI;
 
@@ -47,7 +47,8 @@ public static class ItemPopupWindow
         ImGui.Text($"Times used: {timesUsed}");
         ImGui.Spacing();
 
-        DrawGameIcon(SourceTypeIconQuestionMark, GuiUtilities.IconSize);
+        // TODO: Item Sources!
+        DrawGameIcon(SourceTypeIconQuestionMark, ImGuiUtils.IconSize);
         ImGui.SameLine();
         ImGui.Text("Unknown Source!\nWork In Progress...");
         ImGui.Spacing();
@@ -119,6 +120,7 @@ public static class ItemPopupWindow
         agentChatLog->InsertTextCommandParam(1096, true);
     }
 
+    // TODO: Move to a util function to use for items too
     private static void DrawGameIcon(ushort id, Vector2 size)
     {
         var icon = Service.TextureProvider.GetFromGameIcon(new(id));

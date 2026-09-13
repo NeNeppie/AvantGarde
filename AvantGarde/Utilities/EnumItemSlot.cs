@@ -1,6 +1,6 @@
 using Lumina.Excel.Sheets;
 
-namespace AvantGarde.Utils;
+namespace AvantGarde.Utilities;
 
 public enum ItemSlot : byte
 {
