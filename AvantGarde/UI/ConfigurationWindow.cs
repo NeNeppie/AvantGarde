@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Colors;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -33,7 +34,7 @@ public unsafe class ConfigurationWindow
             return;
         }
 
-        ImGui.TextColored(new Vector4(0.2f, 0.52f, 0.83f, 1f), "General");
+        ImGui.TextColored(ImGuiColors.DalamudYellow, "General");
 
         ImGui.Checkbox("Opt-in to data collection", ref Service.PluginConfig.DataCollectionOptedIn);
         ImGuiHelpers.ScaledDummy(5f);
@@ -59,7 +60,7 @@ public unsafe class ConfigurationWindow
         }
         ImGuiHelpers.ScaledDummy(5f);
 
-        ImGui.TextColored(new Vector4(0.2f, 0.52f, 0.83f, 1f), "Allagan Tools");
+        ImGui.TextColored(ImGuiColors.DalamudYellow, "Allagan Tools");
         ImGui.TextDisabled("These require Allagan Tools to be enabled");
 
         var highlightOwned = Service.PluginConfig.HighlightOwned;
@@ -80,7 +81,7 @@ public unsafe class ConfigurationWindow
 
         ImGuiHelpers.ScaledDummy(25f);
 
-        ImGui.TextColored(new Vector4(0.2f, 0.52f, 0.83f, 1f), "About");
+        ImGui.TextColored(ImGuiColors.DalamudYellow, "About");
         ImGui.Text($"Version: {Service.PluginInterface.Manifest.AssemblyVersion}");
 
         ImGuiHelpers.ScaledDummy(5f);

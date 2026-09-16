@@ -108,14 +108,15 @@ public class ItemSlotWindow
         ImGui.End();
     }
 
-    // TODO: Elipses if two lines of wrapped text exceed space width
-    //       Use default (user theme dependent) imgui text color instead of #FFFFFF
-    //       Move icon drawing to utility function (see ItemPopupWindow.DrawGameIcon)
     public static void DrawItem(Item item, uint useCount = 0, bool selectable = true, bool showIds = false, bool dimmed = false)
     {
-        var icon = Service.TextureProvider.GetFromGameIcon(new(item.Icon));
         var itemName = item.Name.ExtractText();
         var selectableSize = new Vector2(ImGuiUtils.SlotWindowSize.X, ImGuiUtils.IconSize.Y);
+        var tint = dimmed ? Vector4.One with {W = 0.5f} : Vector4.One;
+
+        var textColor = ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(ImGuiCol.Text));
+        if (dimmed)
+            textColor.W = 0.5f;
 
         if (showIds)
             itemName = $"[{item.RowId}] " + itemName;
@@ -128,14 +129,10 @@ public class ItemSlotWindow
             ImGui.SetCursorPosY(ImGui.GetCursorPosY() - ImGuiUtils.IconSize.Y - ImGui.GetStyle().FramePadding.Y);
         }
 
-        if (icon.TryGetWrap(out var texture, out _))
-        {
-            var tint = dimmed ? Vector4.One with {W = 0.5f} : Vector4.One;
-            ImGui.Image(texture.Handle, ImGuiUtils.IconSize, Vector2.Zero, Vector2.One, tint);
+        if (ImGuiUtils.GameIcon(item.Icon, tint: tint))
             ImGui.SameLine();
-        }
 
-        ImGui.TextColoredWrapped(dimmed ? Vector4.One with {W = 0.5f} : Vector4.One, itemName);
+        ImGui.TextColoredWrapped(textColor, itemName);
 
         ItemPopupWindow.Draw(item, useCount);
     }

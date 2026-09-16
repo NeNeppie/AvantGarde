@@ -45,7 +45,10 @@ public unsafe class MainWindow
             return;
         }
 
-        DrawDataCollectionCheckbox(Addon);
+        var configButtonSize = 30f * Addon->Scale;
+        var configButtonPos = new Vector2(735, 47.5f) * Addon->Scale;
+        
+        DrawConfigButton(configButtonSize, configButtonPos);
 
         foreach (var slot in Enum.GetValues<ItemSlot>())
         {
@@ -61,7 +64,7 @@ public unsafe class MainWindow
             
             DrawDyeSlotButton(slot, dyeButtonSize, dyeButtonPos);
             DrawItemSlotButton(slot, slotCategory, itemButtonSize, itemButtonPos);
-                }
+        }
         
         DyeSlotWindow.Draw();
         SlotWindow.Draw();
@@ -70,39 +73,13 @@ public unsafe class MainWindow
         ImGui.End();
     }
 
-    private void DrawDataCollectionCheckbox(AtkUnitBase* addon)
+    private void DrawConfigButton(float size, Vector2 position)
     {
-        const string checkboxStr = "Opt-in to data collection";
+        using var buttonWindow = ImGuiUtils.BeginButtonWindow(size, position, "##child-openconfig");
+        if (!buttonWindow)
+            return;
 
-        var weeklyThemeNode = Addon->GetNodeById(2);
-        var pos = new Vector2(weeklyThemeNode->X + weeklyThemeNode->Width, weeklyThemeNode->Y + (weeklyThemeNode->Height * 0.5f)) * Addon->Scale;
-        var height = ((ImGui.GetStyle().FramePadding.Y * 2f) + ImGui.GetFontSize()) * 1.75f;
-        var width = ImGui.CalcTextSize(checkboxStr).X + height + ImGui.GetStyle().ItemSpacing.X;
-        
-        width = Math.Max(width, 180 * Addon->Scale);
-
-        var size = new Vector2(width, height);
-
-        using var color = ImRaii.PushColor(ImGuiCol.ChildBg, new Vector4(0.9f, 0.87f, 0.78f, 1f))
-                                .Push(ImGuiCol.Text, new Vector4(0.36f, 0.24f, 0.19f, 1f))
-                                .Push(ImGuiCol.FrameBg, new Vector4(0.67f, 0.59f, 0.41f, 1f))
-                                .Push(ImGuiCol.FrameBgHovered, new Vector4(0.522f, 0.431f, 0.325f, 1f))
-                                .Push(ImGuiCol.FrameBgActive, new Vector4(0.365f, 0.263f, 0.235f, 1f))
-                                .Push(ImGuiCol.Border, new Vector4(0.67f, 0.59f, 0.41f, 1f));
-        using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2f)
-                                .Push(ImGuiStyleVar.FrameRounding, 2f)
-                                .Push(ImGuiStyleVar.ChildBorderSize, 2f)
-                                .Push(ImGuiStyleVar.ChildRounding, 5f);
-        
-        ImGui.SetCursorPos(pos);
-        using var crowdsourcingChild = ImRaii.Child("##child-datacollection", size, true);
-        if (crowdsourcingChild)
-        {
-            ImGui.Checkbox(checkboxStr, ref Service.PluginConfig.DataCollectionOptedIn);
-        }
-
-        ImGui.SameLine();
-        if (ImGuiUtils.IconButton(FontAwesomeIcon.Cog, ImGuiUtils.IconSize, "Open Settings"))
+        if (ImGuiUtils.IconButtonThemed(FontAwesomeIcon.Cog, size, "Open Settings"))
             ConfigurationWindow.ToggleVisible();
     }
 
@@ -115,15 +92,7 @@ public unsafe class MainWindow
         if (!buttonWindow)
             return;
 
-        using var color = ImRaii.PushColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f))
-                                .Push(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.3f, 0.3f, 0.7f))
-                                .Push(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f))
-                                .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f));
-
-        using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
-                                .Push(ImGuiStyleVar.FrameRounding, size * 0.5f);
-        
-        if (ImGuiUtils.IconButton(FontAwesomeIcon.Palette, new Vector2(size), "Show Dyes"))
+        if (ImGuiUtils.IconButtonThemed(FontAwesomeIcon.Palette, size, "Show Dyes", circular: true))
         {
             Service.DataManager.DyeData.TryGetValue((uint)slot, out var dyes);
             DyeSlotWindow.Update(slot, dyes, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, size);
@@ -139,17 +108,9 @@ public unsafe class MainWindow
         if (!buttonWindow)
             return;
 
-        using var color = ImRaii.PushColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f))
-                                .Push(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.3f, 0.3f, 0.7f))
-                                .Push(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f))
-                                .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f));
-
-        using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
-                                .Push(ImGuiStyleVar.FrameRounding, size * 0.2f);
-        
         try
         {
-            if (ImGuiUtils.IconButton(FontAwesomeIcon.List, new Vector2(size), "Show Gear"))
+            if (ImGuiUtils.IconButtonThemed(FontAwesomeIcon.List, size, "Show Gear"))
             {
                 Service.DataManager.CategoryData.TryGetValue(DataManager.GetCategoryID(slotCategory), out var items);
                 SlotWindow.Update(slot, items, ImGui.GetWindowPos() + ImGui.GetStyle().FramePadding, size);

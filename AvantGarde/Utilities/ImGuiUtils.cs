@@ -34,6 +34,23 @@ public static class ImGuiUtils
         return res;
     }
 
+    // TODO: Rounding for small buttons
+    public static bool IconButtonThemed(FontAwesomeIcon icon, float size = default, string tooltip = "", bool small = false, bool circular = false, bool useColor = true)
+    {
+        using var color = useColor ? 
+            ImRaii.PushColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f))
+                  .Push(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.3f, 0.3f, 0.7f))
+                  .Push(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f))
+                  .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f))
+            : null;
+
+        var roundingCoefficient = circular ? 0.5f : 0.2f;
+        using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
+                                .Push(ImGuiStyleVar.FrameRounding, roundingCoefficient * size);
+
+        return IconButton(icon, new Vector2(size), tooltip, small); ;
+    }
+
     public static bool HyperlinkButton(string label, string url, Vector2 size = default, bool small = false)
     {
         var res = small ? ImGui.SmallButton(label) : ImGui.Button(label, size);
@@ -49,6 +66,17 @@ public static class ImGuiUtils
         }
 
         return res;
+    }
+
+    public static bool GameIcon(ushort icon, Vector2? size = null, Vector4? tint = null)
+    {
+        var texture = Service.TextureProvider.GetFromGameIcon(new(icon));
+        if (texture.TryGetWrap(out var wrap, out _))
+        {
+            ImGui.Image(wrap.Handle, size ?? IconSize, Vector2.Zero, Vector2.One, tint ?? Vector4.One);
+            return true;
+        }
+        return false;
     }
 
     public static ImRaii.ChildDisposable BeginButtonWindow(float size, Vector2 position, string label)

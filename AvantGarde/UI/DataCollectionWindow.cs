@@ -1,5 +1,6 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Colors;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 
@@ -30,7 +31,7 @@ public class DataCollectionWindow
 
         using (var style = ImRaii.PushStyle(ImGuiStyleVar.ItemSpacing, new Vector2(ImGui.GetStyle().ItemSpacing.X, 10f)))
         {
-            ImGui.TextColored(new Vector4(0.2f, 0.52f, 0.83f, 1f), "Thank you for using Avant-Garde!");
+            ImGui.TextColored(ImGuiColors.DalamudYellow, "Thank you for using Avant-Garde!");
             ImGui.Separator();
         }
 
@@ -47,7 +48,7 @@ public class DataCollectionWindow
         ImGui.Checkbox("Opt-in to data collection", ref Service.PluginConfig.DataCollectionOptedIn);
         ImGui.Spacing();
 
-        ImGui.Text("You can always change your mind by ticking the box inside the Fashion Report window.\nFunctionality is not affected by your choice.");
+        ImGui.Text("You can always change your mind by clicking on the settings button inside the Fashion\nReport window, and ticking the box there.\nFunctionality is not affected by your choice.");
         ImGui.Spacing();
 
         ImGui.TextWrapped("If you encounter any bugs or have any suggestions, please open an issue on github, or let me know on Dalamud's Discord.");

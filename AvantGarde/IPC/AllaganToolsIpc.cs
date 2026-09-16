@@ -59,7 +59,7 @@ public class AllaganToolsIpc
     /// <param name="includeSharedStorage">Whether to include free company chests and housing storage</param>
     public bool FindOwnedItem(uint itemId, bool includeSharedStorage = false)
     {
-        if (!IsAvailable)
+        if (!IsAvailable || !_itemCountOwnedByCategorySub.HasFunction)
             return true;
 
         return _itemCountOwnedByCategorySub.InvokeFunc(itemId, true, [], includeSharedStorage) > 0;

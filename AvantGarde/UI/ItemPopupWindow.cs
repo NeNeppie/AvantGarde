@@ -48,7 +48,7 @@ public static class ItemPopupWindow
         ImGui.Spacing();
 
         // TODO: Item Sources!
-        DrawGameIcon(SourceTypeIconQuestionMark, ImGuiUtils.IconSize);
+        ImGuiUtils.GameIcon(SourceTypeIconQuestionMark);
         ImGui.SameLine();
         ImGui.Text("Unknown Source!\nWork In Progress...");
         ImGui.Spacing();
@@ -118,16 +118,5 @@ public static class ItemPopupWindow
 
         // 1096 is the ID for <item>
         agentChatLog->InsertTextCommandParam(1096, true);
-    }
-
-    // TODO: Move to a util function to use for items too
-    private static void DrawGameIcon(ushort id, Vector2 size)
-    {
-        var icon = Service.TextureProvider.GetFromGameIcon(new(id));
-
-        if (icon.TryGetWrap(out var texture, out _))
-        {
-            ImGui.Image(texture.Handle, size, Vector2.Zero, Vector2.One, Vector4.One);
-        }
     }
 }
