@@ -10,8 +10,6 @@ namespace AvantGarde.UI;
 
 public class DataCollectionWindow
 {
-    private static readonly Vector4 ColorDiscordBlurple = new(0.34f, 0.40f, 0.95f, 1.0f);
-    private static readonly Vector4 ColorGithubOrange = new(0.50f, 0.12f, 0.06f, 1.0f);
     private static readonly ImGuiWindowFlags WindowFlags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize;
     private bool _shouldDraw = true;
     private bool _doNotShowAgain = false;
@@ -68,12 +66,12 @@ public class DataCollectionWindow
         }
         ImGui.SameLine();
 
-        using (var color = ImRaii.PushColor(ImGuiCol.Button, ColorDiscordBlurple))
+        using (var color = ImRaii.PushColor(ImGuiCol.Button, ImGuiUtils.ColorDiscordBlurple))
         {
             ImGuiUtils.HyperlinkButton("Discord Forum Post", "https://discord.com/channels/581875019861328007/1166794253553381456");
             ImGui.SameLine();
         }
-        using (var color = ImRaii.PushColor(ImGuiCol.Button, ColorGithubOrange))
+        using (var color = ImRaii.PushColor(ImGuiCol.Button, ImGuiUtils.ColorGithubOrange))
         {
             ImGuiUtils.HyperlinkButton("Github Issues", "https://github.com/NeNeppie/AvantGarde/issues");
         }

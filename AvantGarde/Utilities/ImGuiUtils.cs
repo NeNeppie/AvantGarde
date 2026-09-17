@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 
 namespace AvantGarde.Utilities;
@@ -11,6 +12,16 @@ public static class ImGuiUtils
     public static Vector2 IconSize => new(ImGui.GetTextLineHeight() * 2f);
     public static Vector2 SlotWindowSize => new(ImGui.CalcTextSize("A").X * 30f, (IconSize.Y + ImGui.GetStyle().ItemSpacing.Y) * 6f);
     public static float ClipperLineHeight => IconSize.Y + ImGui.GetStyle().ItemSpacing.Y;
+
+    #region colors
+    public static readonly Vector4 ColorDiscordBlurple = new(0.34f, 0.40f, 0.95f, 1.0f); // #5865f2
+    public static readonly Vector4 ColorGithubOrange = new(0.50f, 0.12f, 0.06f, 1.0f); // #801E0F
+
+    public static Vector4 GetDefaultColor(ImGuiCol col) => ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(col));
+
+    public static Vector4 TextColor => GetDefaultColor(ImGuiCol.Text);
+    public static Vector4 TextColor50 => TextColor with { W = 0.5f };
+    #endregion
 
     public static void CenterNextElement(Vector2 windowSize, Vector2 elementSize) =>
         ImGui.SetCursorPos((windowSize - elementSize) * 0.5f);
@@ -34,21 +45,38 @@ public static class ImGuiUtils
         return res;
     }
 
-    // TODO: Rounding for small buttons
-    public static bool IconButtonThemed(FontAwesomeIcon icon, float size = default, string tooltip = "", bool small = false, bool circular = false, bool useColor = true)
+    public static bool IconButtonThemed(FontAwesomeIcon icon, float size = default, string tooltip = "", bool circular = false, bool useColor = true)
     {
-        using var color = useColor ? 
+        using var color = useColor ?
             ImRaii.PushColor(ImGuiCol.Button, new Vector4(0.4f, 0.4f, 0.4f, 0.6f))
                   .Push(ImGuiCol.ButtonHovered, new Vector4(0.3f, 0.3f, 0.3f, 0.7f))
                   .Push(ImGuiCol.ButtonActive, new Vector4(0.2f, 0.2f, 0.2f, 0.8f))
                   .Push(ImGuiCol.Border, new Vector4(0.125f, 0.094f, 0.067f, 1f))
+                  .Push(ImGuiCol.Text, Vector4.One)
             : null;
 
         var roundingCoefficient = circular ? 0.5f : 0.2f;
         using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
                                 .Push(ImGuiStyleVar.FrameRounding, roundingCoefficient * size);
 
-        return IconButton(icon, new Vector2(size), tooltip, small); ;
+        return IconButton(icon, new Vector2(size), tooltip); ;
+    }
+
+    // https://github.com/Haselnussbomber/HaselCommon/blob/main/HaselCommon/Gui/ImGuiUtils.cs#L36
+    public static void HyperlinkTooltip(string url)
+    {
+        using var tooltip = ImRaii.Tooltip();
+
+        ImGui.GetWindowDrawList().AddText(
+            UiBuilder.IconFont, 12 * ImGuiHelpers.GlobalScale,
+            ImGui.GetCursorScreenPos() + new Vector2(2 * ImGuiHelpers.GlobalScale),
+            ImGui.ColorConvertFloat4ToU32(TextColor50),
+            FontAwesomeIcon.ExternalLinkAlt.ToIconString()
+        );
+
+        ImGui.SetCursorPosX(ImGui.GetCursorPosX() + (20 * ImGuiHelpers.GlobalScale));
+
+        ImGui.TextColored(TextColor50, url);
     }
 
     public static bool HyperlinkButton(string label, string url, Vector2 size = default, bool small = false)
@@ -57,7 +85,7 @@ public static class ImGuiUtils
 
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip(url);
+            HyperlinkTooltip(url);
         }
 
         if (res)

@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -68,7 +67,7 @@ public static class ItemPopupWindow
         if (ImGui.Selectable("Open in Garland Tools"))
             Process.Start(new ProcessStartInfo { FileName = $"https://garlandtools.org/db/#item/{item.RowId}", UseShellExecute = true });
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip($"https://garlandtools.org/db/#item/{item.RowId}");
+            ImGuiUtils.HyperlinkTooltip($"https://garlandtools.org/db/#item/{item.RowId}");
 
         if (Service.AllaganToolsIpc.IsAvailable)
         {

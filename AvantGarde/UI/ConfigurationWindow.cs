@@ -84,6 +84,14 @@ public unsafe class ConfigurationWindow
         ImGui.TextColored(ImGuiColors.DalamudYellow, "About");
         ImGui.Text($"Version: {Service.PluginInterface.Manifest.AssemblyVersion}");
 
+        using (var color = ImRaii.PushColor(ImGuiCol.Button, ImGuiUtils.ColorDiscordBlurple))
+            ImGuiUtils.HyperlinkButton("Discord Forum Post", "https://discord.com/channels/581875019861328007/1166794253553381456");
+
+        ImGui.SameLine();
+
+        using (var color = ImRaii.PushColor(ImGuiCol.Button, ImGuiUtils.ColorGithubOrange))
+            ImGuiUtils.HyperlinkButton("Github Issues", "https://github.com/NeNeppie/AvantGarde/issues");
+
         ImGuiHelpers.ScaledDummy(5f);
         ImGui.End();
     }

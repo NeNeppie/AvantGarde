@@ -71,9 +71,9 @@ public class ItemSlotWindow
         ImGui.Text($"Avant-Garde: {_slot.GetDescription()}");
         ImGui.Separator();
 
-        if (!_itemsFiltered.Any())
+        if (_itemsFiltered.Count == 0)
         {
-            using (ImRaii.PushColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1f)))
+            using (ImRaii.PushColor(ImGuiCol.Text, ImGuiUtils.TextColor50))
             {
                 ImGui.TextWrapped("""
                 This category is currently empty in the database.
@@ -185,9 +185,9 @@ public class DyeSlotWindow
         ImGui.Text($"Avant-Garde: {_slot.GetDescription()}");
         ImGui.Separator();
 
-        if (!_dyes.Any())
+        if (_dyes.Count == 0)
         {
-            using (ImRaii.PushColor(ImGuiCol.Text, new Vector4(0.5f, 0.5f, 0.5f, 1f)))
+            using (ImRaii.PushColor(ImGuiCol.Text, ImGuiUtils.TextColor50))
             {
                 ImGui.TextWrapped("No dye data currently exists for this slot.");
                 ImGui.Spacing();
