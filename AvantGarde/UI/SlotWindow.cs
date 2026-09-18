@@ -47,11 +47,31 @@ public class ItemSlotWindow
                 var itemIds = items.Select(item => item.Id).ToList();
                 _itemCounts = items.ToDictionary();
                 _itemsFiltered = Service.DataManager.Items
-                    .Where(item => slot.IsMatchingSlot(item) && itemIds.Contains(item.RowId)).ToList();
+                    .Where(item => slot.IsMatchingSlot(item) && itemIds.Contains(item.RowId))
+                    .OrderBy(item =>
+                    {
+                        return (SortingMode)Service.PluginConfig.SortingMode switch
+                        {
+                            SortingMode.PopularityAscending => _itemCounts[item.RowId],
+                            SortingMode.PopularityDescending => -_itemCounts[item.RowId],
+                            SortingMode.InternalId or _ => item.RowId,
+                        };
+                    })
+                    .ToList();
             }
 
             // TODO: Not rely on IPC for inventory searching
             _itemsFiltered.ForEach(item => _itemOwnership[item.RowId] = Service.AllaganToolsIpc.FindOwnedItem(item.RowId));
+
+            if (Service.PluginConfig.SortByOwned && Service.AllaganToolsIpc.IsAvailable)
+            {
+                _itemsFiltered = _itemsFiltered.OrderByDescending(item => 
+                {
+                    if (_itemOwnership.TryGetValue(item.RowId, out var isOwned))
+                        return isOwned;
+                    return false;
+                }).ToList();
+            }
         }
     }
 
@@ -112,7 +132,7 @@ public class ItemSlotWindow
     {
         var itemName = item.Name.ExtractText();
         var selectableSize = new Vector2(ImGuiUtils.SlotWindowSize.X, ImGuiUtils.IconSize.Y);
-        var tint = dimmed ? Vector4.One with {W = 0.5f} : Vector4.One;
+        var tint = dimmed ? Vector4.One with { W = 0.5f } : Vector4.One;
 
         var textColor = ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(ImGuiCol.Text));
         if (dimmed)
