@@ -91,6 +91,17 @@ public class ItemSlotWindow
         ImGui.Text($"Avant-Garde: {_slot.GetDescription()}");
         ImGui.Separator();
 
+        if (!Service.DataManager.IsLoaded)
+        {
+            using (ImRaii.PushColor(ImGuiCol.Text, ImGuiUtils.TextColor50))
+            {
+                ImGui.Text("Loading...");        
+            }
+
+            ImGui.End();
+            return;
+        }
+
         if (_itemsFiltered.Count == 0)
         {
             using (ImRaii.PushColor(ImGuiCol.Text, ImGuiUtils.TextColor50))
@@ -204,6 +215,17 @@ public class DyeSlotWindow
 
         ImGui.Text($"Avant-Garde: {_slot.GetDescription()}");
         ImGui.Separator();
+
+        if (!Service.DataManager.IsLoaded)
+        {
+            using (ImRaii.PushColor(ImGuiCol.Text, ImGuiUtils.TextColor50))
+            {
+                ImGui.Text("Loading...");        
+            }
+
+            ImGui.End();
+            return;
+        }
 
         if (_dyes.Count == 0)
         {

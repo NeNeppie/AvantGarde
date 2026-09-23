@@ -13,6 +13,8 @@ namespace AvantGarde.Managers;
 
 public class DataManager : IDisposable
 {
+    public bool IsLoaded = false;
+
     public Dictionary<uint, List<(uint Id, uint Count)>> CategoryData = [];
     public Dictionary<uint, List<(uint Id, ulong Count, float Pct)>> DyeData = [];
 
@@ -76,6 +78,7 @@ public class DataManager : IDisposable
             return;
 
         CategoryData.Clear();
+        IsLoaded = false;
 
         foreach (var url in DataUrls)
         {   
@@ -119,6 +122,7 @@ public class DataManager : IDisposable
                 }
 
                 _lastUpdate = lastUpdate;
+                IsLoaded = true;
                 Service.PluginLog.Debug($"Data fetched with status code {(int)res.StatusCode} from: {path}");
                 break;
             }
