@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
@@ -10,7 +11,7 @@ using AvantGarde.Utilities;
 
 namespace AvantGarde.Managers;
 
-public class DataManager
+public class DataManager : IDisposable
 {
     public Dictionary<uint, List<(uint Id, uint Count)>> CategoryData = [];
     public Dictionary<uint, List<(uint Id, ulong Count, float Pct)>> DyeData = [];
@@ -29,9 +30,12 @@ public class DataManager
 
     private static readonly HttpClient Client = new();
     private static readonly string[] DataUrls = [
-        "https://raw.githubusercontent.com/Infiziert90/FFXIVGachaSpreadsheet/refs/heads/master/website/static/data/FashionReport.json",
-        "https://xivstats.com/data/FashionReport.json"
+        "https://raw.githubusercontent.com/Infiziert90/FFXIVGachaSpreadsheet/refs/heads/master/website/static/data/",
+        "https://xivstats.com/data/"
     ];
+
+    private readonly Timer RefetchTimer;
+    private DateTime _lastUpdate = new();
 
     public DataManager()
     {
@@ -53,21 +57,33 @@ public class DataManager
 
         Client.DefaultRequestHeaders.Add("Accept", "applcation/json");
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-        PopulateData();
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+        RefetchTimer = new Timer(OnRefetchElapsed, null, 0, 1000 * 60 * 60); // 1 hour
     }
+
+    public void Dispose()
+    {
+        RefetchTimer.Dispose();
+        Client.Dispose();
+    }
+
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+    private void OnRefetchElapsed(object? state) => PopulateData();
+#pragma warning restore CS4014
 
     public async Task PopulateData()
     {
+        if (await FetchLastUpdate() is not DateTime lastUpdate || lastUpdate <= _lastUpdate)
+            return;
+
         CategoryData.Clear();
 
         foreach (var url in DataUrls)
         {   
-            var res = await Client.GetAsync(url);
+            var path = url + "FashionReport.json";
+            var res = await Client.GetAsync(path);
             if (!res.IsSuccessStatusCode)
             {
-                Service.PluginLog.Error($"Failed to fetch data from: {url} , {res.ReasonPhrase}");
+                Service.PluginLog.Error($"Failed to fetch data from: {path} , {res.ReasonPhrase}");
                 continue;
             }
             
@@ -93,7 +109,7 @@ public class DataManager
                         DyeData[slotId] = [];
                         var slot = DyeData[slotId!];
 
-                        foreach(var dye in slotData.Dyes)
+                        foreach (var dye in slotData.Dyes)
                         {
                             slot.Add((dye.Key, dye.Value.Count, dye.Value.Pct));
                         }
@@ -102,14 +118,41 @@ public class DataManager
                     }
                 }
 
-                Service.PluginLog.Debug($"Data fetched with status code {(int)res.StatusCode} from: {url}");
+                _lastUpdate = lastUpdate;
+                Service.PluginLog.Debug($"Data fetched with status code {(int)res.StatusCode} from: {path}");
                 break;
             }
             catch (Exception ex)
             {
-                Service.PluginLog.Error(ex, $"Failed to fetch data from: {url}");
+                Service.PluginLog.Error(ex, $"Failed to fetch data from: {path}");
             }
         }
+    }
+
+    private static async Task<DateTime?> FetchLastUpdate()
+    {
+        foreach (var url in DataUrls)
+        {
+            var path = url + "LastUpdate.json";
+            var res = await Client.GetAsync(path);
+            if (!res.IsSuccessStatusCode)
+            {
+                Service.PluginLog.Error($"Error fetching LastUpdate from {path}");
+                continue;
+            }
+
+            try
+            {
+                var json = await res.Content.ReadAsStringAsync();
+                var lastUpdate = JsonConvert.DeserializeObject<DateTime>(json);
+                return lastUpdate;
+            }
+            catch (Exception ex)
+            {
+                Service.PluginLog.Error(ex, $"Error fetching LastUpdate from {path}");
+            }
+        }
+        return null;
     }
 
     /// <summary>

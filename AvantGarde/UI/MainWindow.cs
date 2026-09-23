@@ -44,6 +44,7 @@ public unsafe class MainWindow
             return;
         }
 
+        // Roughly top right of the Fashion Report window, just above the "attempts" and "high score" strings.
         var configButtonSize = 30f * Addon->Scale;
         var configButtonPos = new Vector2(735, 47.5f) * Addon->Scale;
         

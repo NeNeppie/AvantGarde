@@ -39,6 +39,7 @@ public sealed class Plugin : IDalamudPlugin
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PreClose, "FashionCheck");
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PostSetup, "FashionCheck");
         Service.PluginConfig.Save();
+        Service.DataManager.Dispose();
     }
 
     private unsafe void OnFashionCheckPostSetup(AddonEvent type, AddonArgs args)
