@@ -30,7 +30,7 @@ public unsafe class MainWindow
 
     public void Draw()
     {
-        if (Addon is null) { return; }
+        if (Addon is null || !Addon->IsVisible) { return; }
 
         var windowPos = new Vector2(Addon->X, Addon->Y);
         var windowSize = new Vector2(Addon->RootNode->Width, Addon->RootNode->Height) * Addon->Scale * 1.1f;
@@ -54,7 +54,10 @@ public unsafe class MainWindow
         {
             var slotNodeId = 8 + (uint)slot;
             var atkValueIndex = 2 + ((uint)slot * 11);
-            var slotCategory = Addon->AtkValues[atkValueIndex].String.ToString();
+
+            if (Addon->AtkValues[atkValueIndex] is not {Type: AtkValueType.String or AtkValueType.ManagedString, String: var slotCategory})
+                continue;
+
             var slotNode = Addon->GetNodeById(slotNodeId);
 
             var itemButtonSize = slotNode->Height * 0.8f * Addon->Scale;
@@ -63,7 +66,7 @@ public unsafe class MainWindow
             var dyeButtonPos = GetDyeButtonPos(slotNode, Addon->Scale);
             
             DrawDyeSlotButton(slot, dyeButtonSize, dyeButtonPos);
-            DrawItemSlotButton(slot, slotCategory, itemButtonSize, itemButtonPos);
+            DrawItemSlotButton(slot, slotCategory.ToString(), itemButtonSize, itemButtonPos);
         }
         
         DyeSlotWindow.Draw();

@@ -56,7 +56,7 @@ public static class ImGuiUtils
             : null;
 
         var roundingCoefficient = circular ? 0.5f : 0.2f;
-        using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 2.5f)
+        using var style = ImRaii.PushStyle(ImGuiStyleVar.FrameBorderSize, 1.66f * ImGuiHelpers.GlobalScale)
                                 .Push(ImGuiStyleVar.FrameRounding, roundingCoefficient * size);
 
         return IconButton(icon, new Vector2(size), tooltip); ;
