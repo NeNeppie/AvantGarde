@@ -16,9 +16,9 @@ Each week, a unique theme is presented along with hints for specific slots. Thes
 - Points can be gained either by choosing the correct item for the hint or the correct dye for the slot.
 - On slots with a hint attached, earning points upgrades the stamp/medal. Correct items grant 8/6 points (left vs right side of equipment) and will display a gold medal near them.
 - Rarely, particular items may award a bonus point, for a total of 9/7 points.
-- Lastly, for each slot, choosing the correct shade of a dye grants a point (determined by the icon of the dye item. as of 7.5 the logic still applies but is not visible). Choosing the exact dye grants 2 points.
+- Lastly, for each slot, choosing the correct shade of a dye grants a point (determined by the icon of the dye item, with Metallic Silver being an exception. as of 7.5 the logic still applies but is not visible). Choosing the exact dye grants 2 points.
 
-It's worth noting that dyes are tied to the weekly theme, and thus cannot be predetermined. The plugin *currently* only cares about gear, and will not display any information about valid dyes.
+It's worth noting that dyes are tied to the weekly theme, and thus cannot be predetermined. The plugin will provide information on dyes and will attempt to guess which dye is correct by rating it.
 
 ## Contributing
 
