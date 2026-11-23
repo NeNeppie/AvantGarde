@@ -96,7 +96,7 @@ public static class ImGuiUtils
         return res;
     }
 
-    public static bool GameIcon(ushort icon, Vector2? size = null, Vector4? tint = null)
+    public static bool GameIcon(uint icon, Vector2? size = null, Vector4? tint = null)
     {
         var texture = Service.TextureProvider.GetFromGameIcon(new(icon));
         if (texture.TryGetWrap(out var wrap, out _))

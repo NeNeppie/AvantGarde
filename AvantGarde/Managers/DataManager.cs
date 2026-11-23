@@ -21,7 +21,7 @@ public class DataManager : IDisposable
     public readonly List<Item> Items;
     public readonly Dictionary<uint, StainEx> StainExMap;
 
-    private static readonly Dictionary<uint, ushort> DyeIconMap = [];
+    private static readonly Dictionary<uint, uint> DyeIconMap = [];
     private static readonly List<int> DyeItemIds =
                 Enumerable.Range(5729, 5813 - 5729 + 1)
         .Concat(Enumerable.Range(13114, 13117 - 13114 + 1))
@@ -239,17 +239,17 @@ public class DataManager : IDisposable
         public Stain Stain;
         public ulong Count = 0;
         public float Confidence = 0;
-        public ushort Icon;
+        public uint Icon;
         public string ScoringShade;
 
         public StainEx(Stain stain)
         {
             Stain = stain;
-            Icon = DyeIconMap.GetValueOrDefault<uint, ushort>(stain.RowId, 27614); // Terebinth icon
+            Icon = DyeIconMap.GetValueOrDefault<uint, uint>(stain.RowId, 27614); // Terebinth icon
             ScoringShade = MapIconToShade(Icon);
         }
 
-        private static string MapIconToShade(ushort icon)
+        private static string MapIconToShade(uint icon)
         {
             return icon switch
             {

@@ -5,31 +5,13 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using Lumina.Excel.Sheets;
 
+using AvantGarde.Managers;
 using AvantGarde.Utilities;
 
 namespace AvantGarde.UI;
 
 public static class ItemPopupWindow
 {
-    private const ushort SourceTypeIconGil          = 061758;
-    private const ushort SourceTypeIconAchievement  = 061767;
-    private const ushort SourceTypeIconDungeon      = 061801;
-    private const ushort SourceTypeIconRaid         = 061802;
-    private const ushort SourceTypeIconTrial        = 061804;
-    private const ushort SourceTypeIconQuestionMark = 061807;
-    private const ushort SourceTypeIconTreasure     = 061808;
-    private const ushort SourceTypeIconFate         = 061809;
-    private const ushort SourceTypeIconTribe        = 061814;
-    private const ushort SourceTypeIconGathering    = 061815;
-    private const ushort SourceTypeIconCrafting     = 061816;
-    private const ushort SourceTypeIconHunt         = 061819;
-    private const ushort SourceTypeIconMGP          = 061820;
-    private const ushort SourceTypeIconMogstore     = 061831;
-    private const ushort SourceTypeIconFieldOps     = 061837;
-    private const ushort SourceTypeIconQuest        = 061839;
-    private const ushort SourceTypeIconExchange     = 061843;
-    private const ushort SourceTypeIconIsland       = 061847;
-
     public static unsafe void Draw(Item item, uint timesUsed)
     {
         using var popup = ImRaii.Popup($"##avantgarde-item-popup-{item.RowId}");
@@ -46,10 +28,7 @@ public static class ItemPopupWindow
         ImGui.Text($"Times used: {timesUsed}");
         ImGui.Spacing();
 
-        // TODO: Item Sources!
-        ImGuiUtils.GameIcon(SourceTypeIconQuestionMark);
-        ImGui.SameLine();
-        ImGui.Text("Unknown Source!\nWork In Progress...");
+        DrawItemSource(item.RowId);
         ImGui.Spacing();
 
         if (ImGui.Selectable("Try On"))
@@ -84,17 +63,25 @@ public static class ItemPopupWindow
             if (ImGui.Selectable("Open in Item Vendor Location"))
                 Service.ItemVendorLocIpc.OpenVendorResults(item.RowId);
         }
+    }
 
-        // TODO: Possible item {EQUIPABLE GEAR} sources:
-        //      * Crafting
-        //      * Exchange (Special Shop - non-gil-currencies, raids tokens, tomestones, etc.)
-        //      * Gil Shops (Gridania/Uldah/Limsa etc.)
-        //      * Marketboard (e.g. old Starlight Celebration set)
-        //      * Desynth (e.g. rare fishing drops)
-        //      * Instance (Dungeon, Raid Coffers, AR, etc.) Drops
-        //      * Achievement Claim
-        //      * Retainer Ventures (Rare ARR gear exclusive to Ventures)
-        //      * Eureka & Bozja Lockboxes
+    private static void DrawItemSource(uint itemId)
+    {
+        var sources = Service.SourceManager.GetItemSources(itemId);
+        if (sources.Count == 0)
+        {
+            ImGuiUtils.GameIcon(SourceIcons.SourceTypeIconQuestionMark);
+            ImGui.SameLine();
+            ImGui.Text("Unknown Source!\nWork In Progress...");
+            return;   
+        }
+
+        foreach (var source in sources)
+        {
+            ImGuiUtils.GameIcon(source.DisplayIcon);
+            ImGui.SameLine();
+            ImGui.Text(source.AsText());
+        }
     }
 
     private static void DrawIPCSeparator(ref bool shouldDraw)

@@ -23,6 +23,7 @@ internal sealed class Service
     public static Configuration PluginConfig { get; set; } = null!;
     public static AllaganToolsIpc AllaganToolsIpc { get; set; } = null!;
     public static ItemVendorLocationIpc ItemVendorLocIpc { get; set; } = null!;
+    public static ItemSourceManager SourceManager { get; set; } = null!;
 
     public Service()
     {
@@ -30,5 +31,6 @@ internal sealed class Service
         DataManager = new DataManager();
         AllaganToolsIpc = new AllaganToolsIpc();
         ItemVendorLocIpc = new ItemVendorLocationIpc();
+        SourceManager = new ItemSourceManager();
     }
 }
