@@ -92,6 +92,11 @@ public unsafe class ConfigurationWindow
         using (var color = ImRaii.PushColor(ImGuiCol.Button, ImGuiUtils.ColorGithubOrange))
             ImGuiUtils.HyperlinkButton("Github Issues", "https://github.com/NeNeppie/AvantGarde/issues");
 
+        ImGui.SameLine();
+
+        using (var color = ImRaii.PushColor(ImGuiCol.Button, ImGuiUtils.ColorKofiOldRed))
+            ImGuiUtils.HyperlinkButton("Ko-fi", "https://ko-fi.com/neneppie");
+
         ImGuiHelpers.ScaledDummy(5f);
         ImGui.End();
     }

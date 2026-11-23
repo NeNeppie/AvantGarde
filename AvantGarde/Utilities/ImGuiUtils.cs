@@ -16,6 +16,7 @@ public static class ImGuiUtils
     #region colors
     public static readonly Vector4 ColorDiscordBlurple = new(0.34f, 0.40f, 0.95f, 1.0f); // #5865f2
     public static readonly Vector4 ColorGithubOrange = new(0.50f, 0.12f, 0.06f, 1.0f); // #801E0F
+    public static readonly Vector4 ColorKofiOldRed = new(1.0f, 0.37f, 0.36f, 1.0f); // #ff5e5b
 
     public static Vector4 GetDefaultColor(ImGuiCol col) => ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(col));
 
