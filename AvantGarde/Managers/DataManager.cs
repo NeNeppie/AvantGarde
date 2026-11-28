@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -18,7 +19,7 @@ public class DataManager : IDisposable
     public Dictionary<uint, List<(uint Id, uint Count)>> CategoryData = [];
     public Dictionary<uint, List<(uint Id, ulong Count, float Pct)>> DyeData = [];
 
-    public readonly List<Item> Items;
+    public readonly ImmutableList<Item> Items;
     public readonly Dictionary<uint, StainEx> StainExMap;
 
     private static readonly Dictionary<uint, uint> DyeIconMap = [];
@@ -47,7 +48,7 @@ public class DataManager : IDisposable
         // Get all equipable items relevant for Fashion Report. Weapons excluded as those never get hints
         Items = itemSheet!.Where(item => item.EquipSlotCategory.RowId != 0 && item.EquipSlotCategory.Value!.SoulCrystal == 0 
                                                                            && item.EquipSlotCategory.Value!.MainHand == 0
-                                                                           && item.EquipSlotCategory.Value!.OffHand == 0).ToList();
+                                                                           && item.EquipSlotCategory.Value!.OffHand == 0).ToImmutableList();
         Service.PluginLog.Debug($"Number of items loaded: {Items.Count}");
 
         foreach (var id in DyeItemIds)

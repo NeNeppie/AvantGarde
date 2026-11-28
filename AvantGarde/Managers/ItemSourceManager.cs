@@ -16,14 +16,13 @@ public class ItemSourceManager : IDisposable
     private readonly ExcelSheet<ContentFinderCondition> _sContentFinder;
     private readonly ExcelSheet<ENpcBase> _sENpcBase;
     private readonly ExcelSheet<ENpcResident> _sENpcResident;
-    private readonly ExcelSheet<Item> _sItem;
     private readonly ExcelSheet<Map> _sMap;
     private readonly ExcelSheet<RecipeLookup> _sRecipeLookup;
     private readonly ExcelSheet<TopicSelect> _sTopicSelect;
 
     private readonly SubrowExcelSheet<GilShopItem> _sGilShopItem;
 
-    private readonly ImmutableList<uint> _loadedItems = Service.DataManager.Items.Select(item => item.RowId).ToImmutableList();
+    private readonly ImmutableList<uint> _validGearIds = [];
     private readonly FrozenDictionary<uint, List<ItemSource>> _itemSources;
 
     private Dictionary<uint, Map> _eNpcLocations = [];
@@ -36,18 +35,19 @@ public class ItemSourceManager : IDisposable
         _sContentFinder = Service.DalamudDataManager.GetExcelSheet<ContentFinderCondition>();
         _sENpcBase = Service.DalamudDataManager.GetExcelSheet<ENpcBase>();
         _sENpcResident = Service.DalamudDataManager.GetExcelSheet<ENpcResident>();
-        _sItem = Service.DalamudDataManager.GetExcelSheet<Item>();
         _sMap = Service.DalamudDataManager.GetExcelSheet<Map>();
         _sRecipeLookup = Service.DalamudDataManager.GetExcelSheet<RecipeLookup>();
         _sTopicSelect = Service.DalamudDataManager.GetExcelSheet<TopicSelect>();
 
         _sGilShopItem = Service.DalamudDataManager.GetSubrowExcelSheet<GilShopItem>();
 
-        ProcessENpcs();
-
         if (Service.DataManager.Items.Count > 0)
         {
+            _validGearIds = Service.DataManager.Items.Select(i => i.RowId).ToImmutableList();
+            ProcessENpcs();
             _itemSources = CompileSources(Service.DataManager.Items);
+            
+            IsLoaded = true;
         }
         else
         {
@@ -125,7 +125,7 @@ public class ItemSourceManager : IDisposable
             }
 
             // Marketboard source
-            if (_sItem.GetRow(itemId).ItemSearchCategory.RowId != 0)
+            if (item.ItemSearchCategory.RowId != 0)
             {
                 pair.Value.Add(new ItemSourceMarketboard());
             }
@@ -218,7 +218,7 @@ public class ItemSourceManager : IDisposable
     {
         var shopItems = _sGilShopItem.GetRow(shopId);
         var items = shopItems.Select(subrow => subrow.Item.RowId)
-                             .Where(_loadedItems.Contains);
+                             .Where(_validGearIds.Contains);
 
         foreach (var item in items)
             AddItemRelation(item, shopId, resident, map);

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Plugin;
@@ -13,15 +15,18 @@ using AvantGarde.UI;
 
 namespace AvantGarde;
 
-public sealed class Plugin : IDalamudPlugin
+public sealed class Plugin : IAsyncDalamudPlugin
 {
-    private MainWindow _mainWindow;
-    private DataCollectionWindow _infoWindow;
+    private static IDalamudPluginInterface PluginInterface { get; set; } = null!;
+    private MainWindow _mainWindow = null!;
+    private DataCollectionWindow _infoWindow = null!;
     private bool _drawUi = false;
 
-    public Plugin(IDalamudPluginInterface pluginInterface)
+    public Plugin(IDalamudPluginInterface pluginInterface) => PluginInterface = pluginInterface;
+
+    public Task LoadAsync(CancellationToken cancellationToken)
     {
-        pluginInterface.Create<Service>();
+        PluginInterface.Create<Service>();
         _mainWindow = new();
         _infoWindow = new();
 
@@ -31,15 +36,21 @@ public sealed class Plugin : IDalamudPlugin
         Service.AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "FashionCheck", TryExportFashionAttempt);
 
         Service.AddonLifecycle.RegisterListener(AddonEvent.PreClose, "FashionCheck", OnFashionCheckDispose);
+
+        return Task.CompletedTask;
     }
 
-    public void Dispose()
+    public ValueTask DisposeAsync()
     {
         Service.PluginInterface.UiBuilder.Draw -= this.DrawUI;
+
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PreClose, "FashionCheck");
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PostSetup, "FashionCheck");
+
         Service.PluginConfig.Save();
         Service.DataManager.Dispose();
+
+        return ValueTask.CompletedTask;
     }
 
     private unsafe void OnFashionCheckPostSetup(AddonEvent type, AddonArgs args)

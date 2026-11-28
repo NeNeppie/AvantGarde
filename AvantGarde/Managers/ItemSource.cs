@@ -200,9 +200,11 @@ public class ItemSourceDrop : ItemSource
     public ItemSourceDrop(ContentFinderCondition contentFinderCondition) : base(0)
     {
         SourceType = SourceType.Drop;
-        _contentId = contentFinderCondition.RowId;
-        _contentName = contentFinderCondition.Name.ExtractText();
         DisplayIcon = contentFinderCondition.ContentType.Value.Icon;
+        _contentId = contentFinderCondition.RowId;
+
+        var str = contentFinderCondition.Name.ExtractText();
+        _contentName = string.Concat(str[0].ToString().ToUpper(), str.AsSpan(1));
     }
 
     public override string AsText()
@@ -331,7 +333,7 @@ public enum SourceType : byte
     Lockbox,        // RNG coffers? (e.g. eureka, bozja, island sanctuary)
     Treasure        // RNG world drops? (e.g. bunny fates, occult crescent)
 
-    // There's like 1 fucking item that can directly drop from overworld enemies, NOTE: I guess
+    // There's like 1 fucking item that can directly drop from overworld enemies
     // Also quest rewards? I think i'll exclude due to their one-off nature
 }
 

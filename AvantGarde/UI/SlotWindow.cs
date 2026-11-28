@@ -15,17 +15,12 @@ public class ItemSlotWindow
 {
     private static ImGuiWindowFlags WindowFlags => ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize;
 
-    private List<Item> _itemsFiltered;
+    private List<Item> _itemsFiltered = [];
     private Dictionary<uint, uint> _itemCounts = [];
     private Dictionary<uint, bool> _itemOwnership = [];
     private ItemSlot _slot;
     private Vector2 _position = new();
     private bool _isOpen = false;
-
-    public ItemSlotWindow()
-    {
-        _itemsFiltered = Service.DataManager.Items;
-    }
 
     public void Update(ItemSlot slot, List<(uint Id, uint Count)>? items, Vector2 windowPos, float buttonSize)
     {
